@@ -3,19 +3,14 @@ import { AiOutlineLogout, AiOutlineMenu } from "react-icons/ai";
 import FDA_LOGO from "../../assets/logo.jpeg";
 import { FaUserCircle } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
-import { Auth, InstructionLetterStore } from "../../actions";
+import { Auth } from "../../actions";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { TbArrowsDiagonalMinimize2 } from "react-icons/tb";
 
 interface NavBarProps {
   auth: Auth;
-  instructionLetters: InstructionLetterStore;
   FC_Logout: () => void;
-  FC_LoadBankSummaryDetails: (
-    bank_id: string,
-    callBack: (loading: boolean) => void
-  ) => void;
   setOpenVav: (status: boolean) => void;
   sideNavbarStatus: boolean;
 }
@@ -82,7 +77,7 @@ export class NavBar extends Component<NavBarProps, NavBarState> {
                       )}
                     </div>
                     <div className="text-white font-bold">
-                      Market Authorization Management System
+                      HR Management system
                     </div>
                   </div>
                 )}

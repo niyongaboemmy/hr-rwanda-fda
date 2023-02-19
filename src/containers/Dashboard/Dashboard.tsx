@@ -10,7 +10,6 @@ import {
   FC_SetApplications,
   FC_SetError,
   FC_SetSuccess,
-  InstructionLetterStore,
   StatusToSearchApplications,
   System,
 } from "../../actions";
@@ -591,16 +590,13 @@ class App extends Component<AppProps, AppState> {
 const mapStateToProps = ({
   auth,
   system,
-  instructionLetters,
 }: StoreState): {
   auth: Auth;
   system: System;
-  instructionLetters: InstructionLetterStore;
 } => {
   return {
     auth,
     system,
-    instructionLetters,
   };
 };
 

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import FDA_HOMEPAGE from "../../assets/homepage.png";
+import FDA_HOMEPAGE from "../../assets/homepage3.jpg";
 import {
   AiFillEye,
   AiOutlineEyeInvisible,

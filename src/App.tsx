@@ -7,8 +7,6 @@ import {
   FC_Logout,
   System,
   FC_SetError,
-  FC_LoadBankSummaryDetails,
-  InstructionLetterStore,
   FC_SetSuccess,
 } from "./actions";
 import { StoreState } from "./reducers";
@@ -95,15 +93,10 @@ const VerifyRegisteredProduct = lazy(() =>
 interface AppProps {
   auth: Auth;
   system: System;
-  instructionLetters: InstructionLetterStore;
   FC_CheckLoggedIn: (callBack: (status: boolean) => void) => void;
   FC_Logout: () => void;
   FC_GetSystemInfo: (callback: (loading: boolean) => void) => void;
   FC_SetError: (msg: string) => void;
-  FC_LoadBankSummaryDetails: (
-    bank_id: string,
-    callBack: (loading: boolean) => void
-  ) => void;
   FC_SetSuccess: (msg: string) => void;
 }
 
@@ -175,8 +168,6 @@ class _App extends React.Component<AppProps, AppState> {
               <NavBar
                 auth={this.props.auth}
                 FC_Logout={this.props.FC_Logout}
-                instructionLetters={this.props.instructionLetters}
-                FC_LoadBankSummaryDetails={this.props.FC_LoadBankSummaryDetails}
                 sideNavbarStatus={this.state.openSideNav}
                 setOpenVav={(status: boolean) =>
                   this.setState({ openSideNav: status })
@@ -306,16 +297,13 @@ class _App extends React.Component<AppProps, AppState> {
 const mapStateToProps = ({
   auth,
   system,
-  instructionLetters,
 }: StoreState): {
   auth: Auth;
   system: System;
-  instructionLetters: InstructionLetterStore;
 } => {
   return {
     auth,
     system,
-    instructionLetters,
   };
 };
 
@@ -325,5 +313,4 @@ export const App = connect(mapStateToProps, {
   FC_GetSystemInfo,
   FC_SetError,
   FC_SetSuccess,
-  FC_LoadBankSummaryDetails,
 })(_App);

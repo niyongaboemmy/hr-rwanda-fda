@@ -4,8 +4,8 @@ export const APP_TOKEN_NAME = "fda_t_tosoweuhfsofo";
 
 export const setAxiosToken = () => {
   if (localStorage[APP_TOKEN_NAME]) {
-    axios.defaults.headers.common["fda-token"] = localStorage[APP_TOKEN_NAME];
+    axios.defaults.headers.common["hr-token"] = localStorage[APP_TOKEN_NAME];
   } else {
-    delete axios.defaults.headers.common["fda-token"];
+    delete axios.defaults.headers.common["hr-token"];
   }
 };

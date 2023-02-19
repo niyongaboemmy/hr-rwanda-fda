@@ -70,31 +70,6 @@ export interface UserBankGet {
   bank_logo: string;
 }
 
-export interface UserData_Interface {
-  user_id: string;
-  fname: string;
-  lname: string;
-  gender: string;
-  nid: string;
-  email: string;
-  phone: string;
-  location: any;
-  profile_pic: string;
-  role_id: number;
-  username: string;
-  password: string;
-  company_name?: string;
-  company_logo?: string;
-  archive?: any;
-  status?: any;
-  role_name?: string;
-  access?: string;
-  user_custom_access?: Access_Interface[];
-  user_bank?: UserBank_Interface[];
-  user_branches?: branchInterface[];
-  wallet_balance: number;
-}
-
 export interface API_GetUsersDetails {
   user_id: string;
   fname: string;
@@ -395,34 +370,6 @@ export const FC_ForgetPassword_Check = (
       callback(false, "errorToText(error)");
     }
   };
-};
-
-export const FC_GetUserById = async (
-  user_id: string,
-  callBack: (
-    loading: boolean,
-    response: UserData_Interface | null | string,
-    msg: string
-  ) => void
-) => {
-  callBack(true, null, "");
-  try {
-    const res = await axios.get<UserData_Interface | string>(
-      `${API_URL}/user/${user_id}`
-    );
-    console.log(res);
-    if (res.status === 200) {
-      if (res.data === "") {
-        callBack(false, res.data, "User not found in the database!");
-      } else {
-        callBack(false, res.data, "");
-      }
-    } else {
-      callBack(false, null, "Error occurred, try again later!");
-    }
-  } catch (error: any) {
-    callBack(false, null, errorToText(error));
-  }
 };
 
 export const FC_GetDistricts = async (

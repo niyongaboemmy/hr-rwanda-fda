@@ -5,11 +5,6 @@ import {
   LogoutUser,
 } from "./auth.action";
 import {
-  AssignInstructionLettersAction,
-  GetBankSummaryAction,
-  GetInstructionLettersAction,
-} from "./instruction-letter.action";
-import {
   GetSystemInfoAction,
   SetSystemErrorMessageAction,
   SetSystemSuccessMessageAction,
@@ -35,9 +30,6 @@ export type Action =
   | LoginSuccessDetails
   | LogoutUser
   | GetSystemInfoAction
-  | GetInstructionLettersAction
-  | AssignInstructionLettersAction
   | SetSystemErrorMessageAction
-  | GetBankSummaryAction
   | GetApplicationsByDatesAction
   | SetSystemSuccessMessageAction;
