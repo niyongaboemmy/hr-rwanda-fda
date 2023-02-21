@@ -4,10 +4,21 @@ import { ActionTypes } from "./types";
 import { API_URL, DISTRICTS_LOCATION } from "../utils/api";
 import { APP_TOKEN_NAME, setAxiosToken } from "../utils/AxiosToken";
 import { errorToText } from "../utils/functions";
+import { UserAccessList } from "../config/userAccess";
 
 /**
  * * ****************************** INTERFACES *****************************
  */
+
+export enum BooleanEnum {
+  TRUE = "TRUE",
+  FALSE = "FALSE",
+}
+
+export enum UserActiveStatus {
+  ACTIVE = "ACTIVE",
+  DISABLED = "DISABLED",
+}
 
 export interface DistrictLocationItem {
   district_code: string;
@@ -48,81 +59,59 @@ export interface Access_Interface {
   };
 }
 
-export interface branchInterface {
-  bank_branch_id: string;
-  branch_name: string;
-  district_code: string;
-  district_name: string;
-  bank_id: string;
-}
-
-export interface UserBank_Interface {
-  user_bank_id?: string;
+export interface EmploymentItem {
+  employment_id: string;
   user_id: string;
-  bank_id: string;
-  archive?: any;
+  position_id: string;
+  start_date: string;
+  is_acting: BooleanEnum;
+  end_date: string | null;
+  is_active: BooleanEnum;
+  position_name: string;
+  access: {
+    key: UserAccessList;
+    permission: {
+      create: boolean;
+      update: boolean;
+      delete: boolean;
+      view: boolean;
+      export: boolean;
+    };
+  }[];
 }
 
-export interface UserBankGet {
-  bank_id: string;
-  user_bank_id: string;
-  bank_name: string;
-  bank_logo: string;
-}
-
-export interface API_GetUsersDetails {
+export interface UserInterface {
   user_id: string;
-  fname: string;
-  lname: string;
-  nid: string | null;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
   phone_number: string;
   email: string;
-  username: string;
-  role: string;
-  access: string;
-  access_level: string;
-}
-
-export interface UserLoginResponse {
-  user_id: string;
-  fname: string;
-  lname: string;
-  nid: string | null;
-  phone_number: string;
-  email: string;
-  username: string;
-  role: string;
-  access: string;
-  access_level: string;
-  status: number;
+  location_address: string;
+  status: UserActiveStatus;
   jwt: string;
-}
-
-export interface BankValuerInterface {
-  user_id: string;
-  fname: string;
-  lname: string;
-  gender: string;
-  nid: string;
-  location: string;
-  profile_pic: string | null;
-  role_id: string;
-  email: string;
-  phone: string;
-  company_name: string | null;
-  company_logo: string | null;
-  role_name: string;
+  employment: EmploymentItem[];
+  nid_number: string | null;
+  residence: string | null;
+  passport_number: string | null;
+  gender: string | null;
+  nationality: string | null;
+  education_field_id: string | null;
+  education_level_id: string | null;
+  dob: string | null;
+  martial_status: string | null;
 }
 
 export interface Auth {
   loading: boolean;
   isAuthenticated: boolean;
   token: string;
-  user: API_GetUsersDetails | null;
+  user: UserInterface | null;
+  selectedEmployment: EmploymentItem | null;
 }
 
 //* ********************** ACTION TYPE INTERCACES ********************** */
-export interface FerchLoginDetails {
+export interface FetchLoginDetails {
   type: ActionTypes.LOGIN_DETAILS;
   payload: Auth;
 }
@@ -130,7 +119,7 @@ export interface FerchLoginDetails {
 export interface LoginSuccessDetails {
   type: ActionTypes.USER_LOGIN_SUCCESS_DATA;
   payload: {
-    data: API_GetUsersDetails;
+    data: UserInterface;
     token: string;
   };
 }
@@ -143,9 +132,14 @@ export interface LogoutUser {
   type: ActionTypes.LOGOUT;
 }
 
-export interface FerchLoginDetails {
+export interface FetchLoginDetails {
   type: ActionTypes.LOGIN_DETAILS;
   payload: Auth;
+}
+
+export interface SwitchEmploymentAction {
+  type: ActionTypes.SWITCH_EMPLOYMENT;
+  payload: EmploymentItem | null;
 }
 
 /**
@@ -185,18 +179,39 @@ export const FC_Login = (
 ) => {
   return async (dispatch: Dispatch) => {
     try {
-      const res = await axios.post<UserLoginResponse>(
-        `${API_URL}/auth/login`,
+      const res = await axios.post<UserInterface>(
+        `${API_URL}/user/login`,
         data
       );
 
       console.log({ data_after_login: res.data });
+      console.log("Parsed: ", {
+        data: {
+          ...res.data,
+          employment:
+            res.data.employment.length === 0
+              ? []
+              : res.data.employment.map((item) => ({
+                  ...item,
+                  access: JSON.parse(item.access as unknown as string),
+                })),
+        },
+      });
 
       localStorage.setItem(APP_TOKEN_NAME, res.data.jwt);
       dispatch<LoginSuccessDetails>({
         type: ActionTypes.USER_LOGIN_SUCCESS_DATA,
         payload: {
-          data: res.data,
+          data: {
+            ...res.data,
+            employment:
+              res.data.employment.length === 0
+                ? []
+                : res.data.employment.map((item) => ({
+                    ...item,
+                    access: JSON.parse(item.access as unknown as string),
+                  })),
+          },
           token: res.data.jwt,
         },
       });
@@ -229,12 +244,21 @@ export const FC_CheckLoggedIn = (callBack: (status: boolean) => void) => {
     }
     try {
       setAxiosToken();
-      const res = await axios.get<UserLoginResponse>(`${API_URL}/user/current`);
+      const res = await axios.get<UserInterface>(`${API_URL}/user/logged`);
       console.log({ logged_user_details: res.data });
       dispatch<LoginSuccessDetails>({
         type: ActionTypes.USER_LOGIN_SUCCESS_DATA,
         payload: {
-          data: res.data,
+          data: {
+            ...res.data,
+            employment:
+              res.data.employment.length === 0
+                ? []
+                : res.data.employment.map((item) => ({
+                    ...item,
+                    access: JSON.parse(item.access as unknown as string),
+                  })),
+          },
           token: token!,
         },
       });
@@ -384,25 +408,13 @@ export const FC_GetDistricts = async (
   }
 };
 
-export const FC_GetBankValuers = async (
-  role_id: string,
-  bank_id: string,
-  callBack: (
-    loading: boolean,
-    res: BankValuerInterface[] | null,
-    msg: string
-  ) => void
+export const FC_SwitchSelectedEmployment = (
+  employment: EmploymentItem | null
 ) => {
-  try {
-    const res = await axios.get<BankValuerInterface[]>(
-      `${API_URL}/user/bank/${role_id}/${bank_id}`
-    );
-    if (res) {
-      console.log("Res: ", res.data);
-      callBack(false, res.data, "");
-    }
-  } catch (error: any) {
-    console.log("Errr: ", { ...error });
-    callBack(false, [], errorToText(error));
-  }
+  return async (dispatch: Dispatch) => {
+    dispatch<SwitchEmploymentAction>({
+      type: ActionTypes.SWITCH_EMPLOYMENT,
+      payload: employment,
+    });
+  };
 };

@@ -8,6 +8,8 @@ import {
   System,
   FC_SetError,
   FC_SetSuccess,
+  EmploymentItem,
+  FC_SwitchSelectedEmployment,
 } from "./actions";
 import { StoreState } from "./reducers";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -22,6 +24,8 @@ import AppLoading from "./components/AppLoading/AppLoading";
 import Alert, { AlertType } from "./components/Alert/Alert";
 import NetworkError from "./components/NetworkError/NetworkError";
 import Footer from "./components/Footer/Footer";
+import { SwitchEmployment } from "./components/SwitchEmployment/SwitchEmployment";
+import { isAccessAuthorized, UserAccessList } from "./config/userAccess";
 
 //* Components
 
@@ -35,13 +39,6 @@ const Profile = lazy(() =>
     default: Profile,
   }))
 );
-const ApplicationsList = lazy(() =>
-  import("./containers/ApplicationsList/ApplicationsList").then(
-    ({ ApplicationsList }) => ({
-      default: ApplicationsList,
-    })
-  )
-);
 const ChangePassword = lazy(() =>
   import("./containers/ChangePassword/ChangePassword").then(
     ({ ChangePassword }) => ({
@@ -49,41 +46,11 @@ const ChangePassword = lazy(() =>
     })
   )
 );
-
-const RegisterProductPage = lazy(() =>
-  import("./containers/RegisterProductPage/RegisterProductPage").then(
-    ({ RegisterProductPage }) => ({
-      default: RegisterProductPage,
-    })
-  )
-);
-
-const ProductsList = lazy(() =>
-  import("./containers/ProductsList/ProductsList").then(({ ProductsList }) => ({
-    default: ProductsList,
-  }))
-);
-
-const CreateApplication = lazy(() =>
-  import("./containers/CreateApplication/CreateApplication").then(
-    ({ CreateApplication }) => ({
-      default: CreateApplication,
-    })
-  )
-);
-
-const SearchApplication = lazy(() =>
-  import("./containers/SearchApplication/SearchApplication").then(
-    ({ SearchApplication }) => ({
-      default: SearchApplication,
-    })
-  )
-);
-
-const VerifyRegisteredProduct = lazy(() =>
-  import("./containers/VerifyRegisteredProduct/VerifyRegisteredProduct").then(
-    ({ VerifyRegisteredProduct }) => ({
-      default: VerifyRegisteredProduct,
+// Private pages with access
+const PositionsManagement = lazy(() =>
+  import("./containers/PositionsManagement/PositionsManagement").then(
+    ({ PositionsManagement }) => ({
+      default: PositionsManagement,
     })
   )
 );
@@ -98,6 +65,7 @@ interface AppProps {
   FC_GetSystemInfo: (callback: (loading: boolean) => void) => void;
   FC_SetError: (msg: string) => void;
   FC_SetSuccess: (msg: string) => void;
+  FC_SwitchSelectedEmployment: (employment: EmploymentItem | null) => void;
 }
 
 interface AppState {
@@ -136,6 +104,17 @@ class _App extends React.Component<AppProps, AppState> {
     if (this.state.loading === true) {
       return <AppLoading />;
     }
+    if (
+      this.props.auth.selectedEmployment === null &&
+      this.props.auth.isAuthenticated === true
+    ) {
+      return (
+        <SwitchEmployment
+          auth={this.props.auth}
+          setEmploymentItem={this.props.FC_SwitchSelectedEmployment}
+        />
+      );
+    }
     return (
       <Fragment>
         <Router>
@@ -172,6 +151,9 @@ class _App extends React.Component<AppProps, AppState> {
                 setOpenVav={(status: boolean) =>
                   this.setState({ openSideNav: status })
                 }
+                SwitchEmployment={() =>
+                  this.props.FC_SwitchSelectedEmployment(null)
+                }
               />
             }
             <div
@@ -197,7 +179,7 @@ class _App extends React.Component<AppProps, AppState> {
               <div
                 className={`${
                   this.props.auth.isAuthenticated === true
-                    ? "p-1 md:p-2 h-full mt-5 md:mt-0"
+                    ? "p-1 md:p-2 h-full mt-5 md:mt-0 container mx-auto lg:px-2"
                     : ""
                 }`}
               >
@@ -222,17 +204,6 @@ class _App extends React.Component<AppProps, AppState> {
                       loading={this.state.loading}
                       exact
                     />
-                    {
-                      <ProtectedRoute
-                        path="/applications-list"
-                        component={ApplicationsList}
-                        isAuthenticated={this.props.auth.isAuthenticated}
-                        authenticationPath={authenticationPath}
-                        loading={this.state.loading}
-                        exact
-                      />
-                    }
-
                     <ProtectedRoute
                       path="/change-password"
                       component={ChangePassword}
@@ -241,46 +212,19 @@ class _App extends React.Component<AppProps, AppState> {
                       loading={this.state.loading}
                       exact
                     />
-                    <ProtectedRoute
-                      path="/register-product"
-                      component={RegisterProductPage}
-                      isAuthenticated={this.props.auth.isAuthenticated}
-                      authenticationPath={authenticationPath}
-                      loading={this.state.loading}
-                      exact
-                    />
-                    <ProtectedRoute
-                      path="/product-list"
-                      component={ProductsList}
-                      isAuthenticated={this.props.auth.isAuthenticated}
-                      authenticationPath={authenticationPath}
-                      loading={this.state.loading}
-                      exact
-                    />
-                    <ProtectedRoute
-                      path="/create-application"
-                      component={CreateApplication}
-                      isAuthenticated={this.props.auth.isAuthenticated}
-                      authenticationPath={authenticationPath}
-                      loading={this.state.loading}
-                      exact
-                    />
-                    <ProtectedRoute
-                      path="/search-application"
-                      component={SearchApplication}
-                      isAuthenticated={this.props.auth.isAuthenticated}
-                      authenticationPath={authenticationPath}
-                      loading={this.state.loading}
-                      exact
-                    />
-                    <ProtectedRoute
-                      path="/verify-registered-product"
-                      component={VerifyRegisteredProduct}
-                      isAuthenticated={this.props.auth.isAuthenticated}
-                      authenticationPath={authenticationPath}
-                      loading={this.state.loading}
-                      exact
-                    />
+                    {isAccessAuthorized(
+                      this.props.auth.selectedEmployment,
+                      UserAccessList.POSITIONS
+                    ).view === true && (
+                      <ProtectedRoute
+                        path="/positions-management"
+                        component={PositionsManagement}
+                        isAuthenticated={this.props.auth.isAuthenticated}
+                        authenticationPath={authenticationPath}
+                        loading={this.state.loading}
+                        exact
+                      />
+                    )}
                   </Suspense>
                 </Switch>
               </div>
@@ -313,4 +257,5 @@ export const App = connect(mapStateToProps, {
   FC_GetSystemInfo,
   FC_SetError,
   FC_SetSuccess,
+  FC_SwitchSelectedEmployment,
 })(_App);

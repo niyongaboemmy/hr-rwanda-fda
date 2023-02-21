@@ -7,12 +7,15 @@ import { Auth } from "../../actions";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { TbArrowsDiagonalMinimize2 } from "react-icons/tb";
+import { SiWheniwork } from "react-icons/si";
+import { HiOutlineBriefcase } from "react-icons/hi";
 
 interface NavBarProps {
   auth: Auth;
   FC_Logout: () => void;
   setOpenVav: (status: boolean) => void;
   sideNavbarStatus: boolean;
+  SwitchEmployment: () => void;
 }
 interface NavBarState {
   view_user: boolean;
@@ -76,8 +79,15 @@ export class NavBar extends Component<NavBarProps, NavBarState> {
                         <AiOutlineMenu className="text-2xl text-primary-100 animate__animated animate__fadeIn" />
                       )}
                     </div>
-                    <div className="text-white font-bold">
-                      HR Management system
+                    <div className="">
+                      <div className="flex flex-row items-center gap-2 text-lg rounded-full w-max pr-3 cursor-pointer group">
+                        <div>
+                          <SiWheniwork className="text-3xl text-primary-300 group-hover:text-yellow-300" />
+                        </div>
+                        <span className="text-white font-bold">
+                          {this.props.auth.selectedEmployment?.position_name}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -90,7 +100,11 @@ export class NavBar extends Component<NavBarProps, NavBarState> {
                       onClick={() =>
                         this.setState({ view_user: !this.state.view_user })
                       }
-                      className="bg-primary-700 rounded-full flex items-center justify-center hover:bg-primary-900 h-10 w-10 text-white  cursor-pointer"
+                      className={`rounded-full flex items-center justify-center ${
+                        this.state.view_user === true
+                          ? "bg-red-600 text-white border-2 border-white"
+                          : "bg-primary-700 hover:bg-primary-900 text-white"
+                      }  h-10 w-10  cursor-pointer`}
                     >
                       {this.state.view_user === false ? (
                         <FaUserCircle className="text-4xl animate__animated animate__fadeIn" />
@@ -100,52 +114,73 @@ export class NavBar extends Component<NavBarProps, NavBarState> {
                     </div>
                     {this.state.view_user === true && (
                       <div className="absolute right-0 pt-4">
-                        <div className="border border-gray-400 bg-white p-3 rounded-md w-64 shadow-xl animate__animated animate__zoomInDown animate_fast">
+                        <div className="border border-gray-300 bg-white p-3 rounded-md w-64 shadow-xl animate__animated animate__zoomInDown animate__faster">
                           <div className="flex flex-col items-center justify-center w-full gap-0">
                             <div className="mt-3">
                               <div className="rounded-full text-gray-400 flex items-center justify-center h-24 w-24 overflow-hidden">
                                 <FaUserCircle className="text-8xl" />
                               </div>
                             </div>
-                            <div className="font-bold text-center mb-2 text-black">
+                            <div className="font-bold text-center mb-1 text-black mt-2">
                               <span>
-                                {this.props.auth.user?.fname}{" "}
-                                {this.props.auth.user?.lname}
+                                {
+                                  this.props.auth.selectedEmployment
+                                    ?.position_name
+                                }
                               </span>
                             </div>
-                            <div className="font-bold text-center text-sm w-max bg-primary-800 text-white px-3 py-1 rounded-xl truncate">
-                              {this.props.auth.user?.access_level}
+                            <div className="font-bold text-center text-sm w-max bg-primary-700 text-white px-3 py-1 rounded-xl truncate">
+                              {
+                                this.props.auth.selectedEmployment
+                                  ?.position_name
+                              }
                             </div>
                           </div>
 
                           <div className="mt-5 text-black">
-                            <div className="text-sm text-gray-600 mt-5">
-                              Action menu
+                            <div className="text-sm text-gray-600 mt-5 mb-2">
+                              ACTION MENU
                             </div>
                             <Link
                               onClick={() =>
                                 this.setState({ view_user: false })
                               }
                               to={"/profile"}
-                              className="flex flex-row items-center gap-2 bg-gray-200 rounded-md px-2 py-1 cursor-pointer hover:bg-primary-800 hover:text-white group mb-2"
+                              className="flex flex-row items-center gap-2 bg-gray-50 rounded-md px-2 py-1 cursor-pointer hover:bg-primary-700 hover:text-white group"
                             >
                               <div>
-                                <FaUserCircle className="text-xl text-gray-500 group-hover:text-white" />
+                                <FaUserCircle className="text-xl text-primary-700 group-hover:text-white" />
                               </div>
                               <div>User Profile</div>
                             </Link>
+                            {this.props.auth.user !== null &&
+                              this.props.auth.user.employment.length > 0 && (
+                                <div
+                                  onClick={() => {
+                                    this.setState({ view_user: false });
+                                    this.props.SwitchEmployment();
+                                  }}
+                                  className="flex flex-row items-center gap-2 bg-gray-50 rounded-md px-2 py-1 cursor-pointer hover:bg-primary-700 hover:text-white group"
+                                >
+                                  <div>
+                                    <HiOutlineBriefcase className="text-xl text-yellow-600 group-hover:text-white" />
+                                  </div>
+                                  <div>Change position</div>
+                                </div>
+                              )}
                             <Link
                               onClick={() =>
                                 this.setState({ view_user: false })
                               }
                               to={"/change-password"}
-                              className="flex flex-row items-center gap-2 bg-gray-200 rounded-md px-2 py-1 cursor-pointer hover:bg-primary-800 hover:text-white group"
+                              className="flex flex-row items-center gap-2 bg-gray-50 rounded-md px-2 py-1 cursor-pointer hover:bg-primary-700 hover:text-white group"
                             >
                               <div>
-                                <RiLockPasswordLine className="text-xl text-gray-500 group-hover:text-white" />
+                                <RiLockPasswordLine className="text-xl text-red-700 group-hover:text-white" />
                               </div>
                               <div>Change password</div>
                             </Link>
+
                             <div
                               onClick={() => {
                                 this.setState({ view_user: false });

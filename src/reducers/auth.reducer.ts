@@ -3,6 +3,7 @@ import { APP_TOKEN_NAME } from "../utils/AxiosToken";
 // default state
 const defaultState: Auth = {
   user: null,
+  selectedEmployment: null,
   loading: true,
   isAuthenticated: false,
   token: "",
@@ -23,6 +24,15 @@ export const authReducer = (state: Auth = defaultState, action: Action) => {
         token: action.payload.token,
         loading: false,
         isAuthenticated: true,
+        selectedEmployment:
+          action.payload.data.employment.length === 1
+            ? action.payload.data.employment[0]
+            : null,
+      };
+    case ActionTypes.SWITCH_EMPLOYMENT:
+      return {
+        ...state,
+        selectedEmployment: action.payload,
       };
     case ActionTypes.CLEAN_USER_DETAILS:
       return {

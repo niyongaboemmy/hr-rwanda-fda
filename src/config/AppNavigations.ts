@@ -1,14 +1,15 @@
 import { IconType } from "react-icons";
-import { MdAdd, MdAddTask, MdOutlineDashboard } from "react-icons/md";
-import { HiDatabase, HiOutlineUser } from "react-icons/hi";
-import { RiLockPasswordLine, RiSearchLine } from "react-icons/ri";
-import { BsFileEarmarkMedical } from "react-icons/bs";
+import { MdOutlineDashboard } from "react-icons/md";
+import { HiOutlineBriefcase, HiOutlineUser } from "react-icons/hi";
+import { RiLockPasswordLine } from "react-icons/ri";
+import { UserAccessList } from "./userAccess";
 
 export enum MENU_TYPE {
   NONE = "NONE",
   PROFILE = "PROFILE",
-  APPLICATIONS = "APPLICATIONS",
-  REGISTERED_PRODUCTS = "REGISTERED_PRODUCTS",
+  ACTIVITIES = "ACTIVITIES",
+  REPORTS = "REPORTS",
+  SETTINGS = "SETTINGS",
 }
 
 export interface NavigationInterface {
@@ -22,6 +23,7 @@ export interface SideNavigationInterface {
   icon: IconType;
   label: string;
   menu_type: MENU_TYPE;
+  access: UserAccessList | "all";
 }
 
 /**
@@ -61,6 +63,7 @@ export const AUTHENTICATED_MENUS: SideNavigationInterface[] = [
     label: "Dashboard",
     url: "/dashboard",
     menu_type: MENU_TYPE.NONE,
+    access: "all",
   },
   {
     icon: HiOutlineUser,
@@ -68,6 +71,7 @@ export const AUTHENTICATED_MENUS: SideNavigationInterface[] = [
     label: "Profile",
     url: "/profile",
     menu_type: MENU_TYPE.PROFILE,
+    access: "all",
   },
   {
     icon: RiLockPasswordLine,
@@ -75,41 +79,15 @@ export const AUTHENTICATED_MENUS: SideNavigationInterface[] = [
     label: "Change Password",
     url: "/change-password",
     menu_type: MENU_TYPE.PROFILE,
+    access: "all",
   },
   {
-    icon: MdAdd,
-    title: "Create applications",
-    label: "Create applications",
-    url: "/create-application",
-    menu_type: MENU_TYPE.APPLICATIONS,
-  },
-  {
-    icon: RiSearchLine,
-    title: "Search application",
-    label: "Search application",
-    url: "/search-application",
-    menu_type: MENU_TYPE.APPLICATIONS,
-  },
-  {
-    icon: BsFileEarmarkMedical,
-    title: "Explore applications",
-    label: "Explore applications",
-    url: "/applications-list",
-    menu_type: MENU_TYPE.APPLICATIONS,
-  },
-  {
-    icon: MdAddTask,
-    title: "Register product",
-    label: "Register product",
-    url: "/register-product",
-    menu_type: MENU_TYPE.REGISTERED_PRODUCTS,
-  },
-  {
-    icon: HiDatabase,
-    title: "List of products",
-    label: "List of products",
-    url: "/product-list",
-    menu_type: MENU_TYPE.REGISTERED_PRODUCTS,
+    icon: HiOutlineBriefcase,
+    title: "Positions management",
+    label: "Positions management",
+    url: "/positions-management",
+    menu_type: MENU_TYPE.ACTIVITIES,
+    access: "all",
   },
 ];
 
@@ -121,11 +99,11 @@ export const menus_categories = (): { key: MENU_TYPE; title: string }[] => {
       title:
         menu === MENU_TYPE.PROFILE
           ? "Profile"
-          : menu === MENU_TYPE.APPLICATIONS
-          ? "Applications"
-          : menu === MENU_TYPE.REGISTERED_PRODUCTS
-          ? "Registered Products"
-          : "",
+          : menu === MENU_TYPE.ACTIVITIES
+          ? "Activities"
+          : menu === MENU_TYPE.REPORTS
+          ? "Reports"
+          : "Settings",
     });
   }
   return response.filter((element) =>

@@ -46,7 +46,8 @@ class _Profile extends Component<ProfileProps, ProfileState> {
                 <div className="col-span-12 md:col-span-6 lg:col-span-4 flex flex-col">
                   <span className="text-gray-600 text-sm">User Names</span>
                   <span className="font-semibold">
-                    {this.props.auth.user.fname} {this.props.auth.user.lname}
+                    {this.props.auth.user.first_name}{" "}
+                    {this.props.auth.user.last_name}
                   </span>
                 </div>
                 <div className="col-span-12 md:col-span-6 lg:col-span-4 flex flex-col">
@@ -64,15 +65,10 @@ class _Profile extends Component<ProfileProps, ProfileState> {
                 <div className="col-span-12 md:col-span-6 lg:col-span-4 flex flex-col">
                   <span className="text-gray-600 text-sm">Access level</span>
                   <span className="font-semibold">
-                    {this.props.auth.user.access_level}
+                    {/* {this.props.auth.user.access_level} */}
                   </span>
                 </div>
-                <div className="col-span-12 md:col-span-6 lg:col-span-4 flex flex-col">
-                  <span className="text-gray-600 text-sm">User access</span>
-                  <span className="font-semibold">
-                    {this.props.auth.user.access}
-                  </span>
-                </div>
+
                 <div className="col-span-12 border-t border-gray-300 mt-10 mb-5"></div>
                 <div className="col-span-12 flex flex-col md:flex-row gap-3">
                   <div className="px-3 py-2 text-sm text-black bg-gray-200 hover:bg-gray-300 rounded-md cursor-pointer flex flex-row items-center gap-2 w-52">

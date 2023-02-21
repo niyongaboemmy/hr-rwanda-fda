@@ -1,8 +1,8 @@
-import { GetApplicationsByDatesAction } from "./applications";
 import {
   CleanUserDetails,
   LoginSuccessDetails,
   LogoutUser,
+  SwitchEmploymentAction,
 } from "./auth.action";
 import {
   GetSystemInfoAction,
@@ -16,13 +16,9 @@ export enum ActionTypes {
   CLEAN_USER_DETAILS = "CLEAN_USER_DETAILS",
   LOGOUT = "LOGOUT",
   GET_SYSTEM_INFO = "GET_SYSTEM_INFO",
-  GET_INSTRUCTION_LETTERS = "GET_INSTRUCTION_LETTERS",
-  ASSIGN_INSTRUCTION_LETTER = "ASSIGN_INSTRUCTION_LETTER",
   SET_SYSTEM_ERROR_MESSAGE = "SET_SYSTEM_ERROR_MESSAGE",
-  GET_BANK_SUMMARY = "GET_BANK_SUMMARY",
-  // New Enums
-  GET_APPLICATIONS_BY_DATES = "GET_APPLICATIONS_BY_DATES",
   SET_SYSTEM_SUCCESS_MESSAGE = "SET_SYSTEM_SUCCESS_MESSAGE",
+  SWITCH_EMPLOYMENT = "SWITCH_EMPLOYMENT",
 }
 
 export type Action =
@@ -31,5 +27,5 @@ export type Action =
   | LogoutUser
   | GetSystemInfoAction
   | SetSystemErrorMessageAction
-  | GetApplicationsByDatesAction
-  | SetSystemSuccessMessageAction;
+  | SetSystemSuccessMessageAction
+  | SwitchEmploymentAction;

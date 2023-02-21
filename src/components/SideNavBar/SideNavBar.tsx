@@ -7,6 +7,7 @@ import {
   AUTHENTICATED_MENUS,
   menus_categories,
 } from "../../config/AppNavigations";
+import { isAccessAuthorized } from "../../config/userAccess";
 
 interface SideNavBarProps {
   auth: Auth;
@@ -46,11 +47,23 @@ export class SideNavBar extends Component<SideNavBarProps, SideNavBarState> {
           <div className="flex flex-col mb-3">
             {menus_categories().map((item, k) => (
               <div key={k + 1} className="mt-5">
-                <div className="text-gray-500 uppercase text-xs px-5 mb-1">
-                  {item.title}
-                </div>
+                {menus.filter((itm) => itm.menu_type === item.key).length >
+                  0 && (
+                  <div className="text-gray-500 uppercase text-xs px-5 mb-1">
+                    {item.title}
+                  </div>
+                )}
                 {menus
                   .filter((itm) => itm.menu_type === item.key)
+                  .filter(
+                    (itm) =>
+                      itm.access === "all" ||
+                      (this.props.auth.selectedEmployment !== null &&
+                        isAccessAuthorized(
+                          this.props.auth.selectedEmployment,
+                          itm.access
+                        ))
+                  )
                   .map((nav, i) => (
                     <NavLink
                       key={i + 1}

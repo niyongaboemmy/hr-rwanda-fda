@@ -75,7 +75,7 @@ export class ChangePassword extends Component<
     }
     this.setState({ loading: true, formError: null, success: "" });
     try {
-      const res = await axios.patch(`${API_URL}/user/change/password`, {
+      const res = await axios.post(`${API_URL}/user/change/password`, {
         newPassword: this.state.new_password,
         oldPassword: this.state.current_password,
       });

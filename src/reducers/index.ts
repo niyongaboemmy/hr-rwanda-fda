@@ -1,6 +1,5 @@
 import { combineReducers } from "redux";
-import { ApplicationsStore, Auth, System } from "../actions";
-import { applicationsReducer } from "./applications";
+import { Auth, System } from "../actions";
 import { authReducer } from "./auth.reducer";
 import { systemReducer } from "./system.reducer";
 
@@ -8,11 +7,9 @@ import { systemReducer } from "./system.reducer";
 export interface StoreState {
   auth: Auth;
   system: System;
-  applications: ApplicationsStore;
 }
 
 export const reducers = combineReducers<StoreState>({
   auth: authReducer,
   system: systemReducer,
-  applications: applicationsReducer,
 });
