@@ -15,7 +15,7 @@ const ExportToExcel: React.FC<ExportToExcelProps> = ({
   fileData,
   fileName,
   btnName = "Excel",
-  className = "flex items-center gap-1 px-2 py-1 pr-3 rounded text-green-700 bg-white border hover:text-white hover:bg-green-700 border-green-700 font-bold",
+  className = "flex items-center gap-1 px-2 py-1 pr-3 rounded text-green-700 bg-white border hover:text-white hover:bg-green-700 border-green-600 font-bold",
   showIcon = true,
 }) => {
   const fileType =
@@ -37,7 +37,10 @@ const ExportToExcel: React.FC<ExportToExcelProps> = ({
     >
       {showIcon && (
         <div>
-          <RiFileExcel2Fill className="text-xl" />
+          <RiFileExcel2Fill
+            className="text-xl"
+            style={{ marginTop: "3px", marginBottom: "3px" }}
+          />
         </div>
       )}
       {btnName}

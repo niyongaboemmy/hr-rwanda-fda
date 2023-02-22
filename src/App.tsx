@@ -88,7 +88,14 @@ class _App extends React.Component<AppProps, AppState> {
     this.setState({ loading: true });
     this.props.FC_CheckLoggedIn((status: boolean) => {
       if (status === true) {
-        this.setState({ loading: false });
+        // Check if basic info loaded
+        if (this.props.system.basic_info === null) {
+          this.props.FC_GetSystemInfo((loading: boolean) => {
+            this.setState({ loading: loading });
+          });
+        } else {
+          this.setState({ loading: false });
+        }
       }
     });
   }

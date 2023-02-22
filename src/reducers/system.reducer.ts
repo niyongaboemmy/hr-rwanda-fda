@@ -15,7 +15,7 @@ const defaultState: System = {
  */
 export const systemReducer = (state: System = defaultState, action: Action) => {
   switch (action.type) {
-    case ActionTypes.GET_SYSTEM_INFO:
+    case ActionTypes.GET_SYSTEM_BASIC_INFO:
       return {
         ...state,
         basic_info: action.payload,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BsCheckCircle } from "react-icons/bs";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { IoMdClose } from "react-icons/io";
@@ -18,6 +18,7 @@ interface AlertProps {
   description?: string;
   close: () => void;
   className?: string;
+  timeOut?: number;
 }
 
 const Alert = (props: AlertProps) => {
@@ -31,6 +32,14 @@ const Alert = (props: AlertProps) => {
       : props.alertType === AlertType.INFO
       ? "blue"
       : "gray";
+
+  useEffect(() => {
+    props.timeOut !== undefined &&
+      setTimeout(() => {
+        props.close();
+      }, props.timeOut);
+  });
+
   return (
     <div
       className={`flex flex-row items-center w-full justify-between gap-3 text-${color}-900 bg-${color}-100 rounded-md p-2 animate__animated ${
