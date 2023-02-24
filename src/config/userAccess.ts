@@ -1,15 +1,5 @@
 import { EmploymentItem } from "../actions";
 
-export interface UserAccessInterface {
-  key: any;
-  permissions: {
-    view: boolean;
-    create: boolean;
-    updated: boolean;
-    delete: boolean;
-    export: boolean;
-  };
-}
 export enum UserAccessList {
   COMPETENCY_SETTINGS = "COMPETENCY_SETTINGS",
   COMPETENCY_FUNCTION_SETTINGS = "COMPETENCY_FUNCTION_SETTINGS",
@@ -52,14 +42,25 @@ export enum UserAccessList {
   REPORT_TRAVEL_RETURN = "REPORT_TRAVEL_RETURN",
 }
 
+export interface UserAccessInterface {
+  key: UserAccessList;
+  permission: {
+    view: boolean;
+    create: boolean;
+    update: boolean;
+    delete: boolean;
+    export: boolean;
+  };
+}
+
 export const isAccessAuthorized = (
   selectedEmployment: EmploymentItem | null,
   access: UserAccessList
 ): {
+  view: boolean;
   create: boolean;
   update: boolean;
   delete: boolean;
-  view: boolean;
   export: boolean;
 } => {
   if (selectedEmployment !== null) {
@@ -72,9 +73,9 @@ export const isAccessAuthorized = (
   }
   return {
     create: false,
-    update: false,
     delete: false,
-    view: false,
     export: false,
+    update: false,
+    view: false,
   };
 };

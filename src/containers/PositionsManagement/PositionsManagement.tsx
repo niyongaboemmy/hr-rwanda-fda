@@ -3,10 +3,15 @@ import { BsFilterCircle } from "react-icons/bs";
 import { HiOutlineBriefcase } from "react-icons/hi";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { connect } from "react-redux";
-import { Auth, System } from "../../actions";
+import {
+  Auth,
+  FC_GetAllUnits,
+  System,
+  UnitInterface,
+  UnitStore,
+} from "../../actions";
 import MainContainer from "../../components/MainContainer/MainContainer";
 import { StoreState } from "../../reducers";
-import { RiSearchLine } from "react-icons/ri";
 import ExportToExcel from "../../components/GenerateReport/ExportToExcel";
 import { PositionItem } from "../../components/PositionItem/PositionItem";
 import Modal, {
@@ -16,13 +21,35 @@ import Modal, {
 } from "../../components/Modal/Modal";
 import { PositionDetails } from "../../components/PositionDetails/PositionDetails";
 import { NoResultFound } from "../../components/Fragments/NoResultFound";
+import {
+  FC_GetAllPositions,
+  PositionInterface,
+  PositionStore,
+} from "../../actions/position.action";
+import { PositionItemLoading } from "../../components/PositionItem/PositionItemLoading";
+import { commaFy, search } from "../../utils/functions";
+import { SelectUnit } from "../../components/SelectUnit/SelectUnit";
+import SearchInput from "../../components/Fragments/SearchInput";
+import { IoMdRefreshCircle } from "react-icons/io";
 
-interface PositionsManagementProps {}
+interface PositionsManagementProps {
+  auth: Auth;
+  system: System;
+  position: PositionStore;
+  units: UnitStore;
+  FC_GetAllPositions: (
+    callback: (loading: boolean, error: string) => void
+  ) => void;
+  FC_GetAllUnits: (callback: (loading: boolean, error: string) => void) => void;
+}
 interface PositionsManagementState {
   loading: boolean;
   tabs: "SUMMARY" | "POSITIONS";
-  selectedPosition: any;
+  selectedPosition: PositionInterface | null;
+  selectedUnit: UnitInterface | null;
   searchData: string;
+  mainError: string;
+  openSelectUnit: boolean;
 }
 
 class _PositionsManagement extends Component<
@@ -36,11 +63,53 @@ class _PositionsManagement extends Component<
       loading: false,
       tabs: "POSITIONS",
       selectedPosition: null,
+      selectedUnit: null,
       searchData: "",
+      mainError: "",
+      openSelectUnit: false,
     };
   }
   FilteredData = () => {
-    return [];
+    if (this.props.position.positions === null) {
+      return [];
+    }
+    var response = this.props.position.positions;
+    if (this.state.selectedUnit !== null) {
+      response = response.filter(
+        (itm) =>
+          this.state.selectedUnit !== null &&
+          itm.unit_id.toString() === this.state.selectedUnit.unit_id.toString()
+      );
+    }
+    return search(response, this.state.searchData) as PositionInterface[];
+  };
+  getUnitName = (unit_id: string): string => {
+    if (this.props.units.units !== null) {
+      const unit = this.props.units.units.find(
+        (itm) => itm.unit_id.toString() === unit_id.toString()
+      );
+      if (unit !== undefined) {
+        return unit.unit_name;
+      }
+    }
+    return "";
+  };
+  componentDidMount = () => {
+    if (this.props.units.units === null) {
+      this.setState({ loading: true });
+      this.props.FC_GetAllPositions((loading: boolean, error: string) => {
+        this.setState({ loading: loading, mainError: error });
+      });
+    }
+  };
+  getSelectedPosition = (): PositionInterface | null => {
+    if (this.props.position.positions === null) {
+      return null;
+    }
+    const response = this.props.position.positions.find(
+      (itm) => itm.position_id === this.state.selectedPosition?.position_id
+    );
+    return response !== undefined ? response : null;
   };
   render() {
     return (
@@ -62,109 +131,129 @@ class _PositionsManagement extends Component<
             </div>
             {/* Right side */}
             <div className="flex flex-row items-center justify-end gap-2 w-1/2">
-              <div className="flex flex-row items-center justify-between gap-6 bg-white hover:bg-primary-100 border border-primary-700 rounded cursor-pointer pr-2 group truncate">
+              <div
+                onClick={() => this.setState({ openSelectUnit: true })}
+                className="flex flex-row items-center justify-between gap-6 bg-white hover:bg-primary-100 border border-primary-700 rounded cursor-pointer pr-2 group truncate"
+              >
                 <div className="flex flex-row items-center gap-2 truncate">
                   <div>
                     <div className="bg-primary-700 flex items-center justify-center h-10 w-10">
                       <BsFilterCircle className="text-2xl text-white" />
                     </div>
                   </div>
-                  <div className="font-bold text-sm text-gray-500 group-hover:text-primary-800 py-1 truncate">
-                    Search by positions Units
-                  </div>
+                  {this.state.selectedUnit === null ? (
+                    <div className="font-bold text-sm text-gray-500 group-hover:text-primary-800 py-1 truncate">
+                      Search by positions Units
+                    </div>
+                  ) : (
+                    <div className="font-bold text-sm text-primary-800 group-hover:text-primary-900 py-1 truncate">
+                      {this.state.selectedUnit.unit_name}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <MdOutlineKeyboardArrowDown className="text-2xl text-gray-500 group-hover:text-primary-700" />
                 </div>
               </div>
+              {this.state.selectedUnit !== null && (
+                <div
+                  onClick={() => this.setState({ selectedUnit: null })}
+                  title="Reset to view back all of the positions"
+                  className=" rounded-full flex items-center justify-center text-yellow-600 hover:text-yellow-700 cursor-pointer"
+                >
+                  <IoMdRefreshCircle className="text-4xl bg-white rounded-full" />
+                </div>
+              )}
               <div className="flex flex-col">
                 <div className="text-sm text-gray-600 truncate">
                   Total positions
                 </div>
-                <div className="font-bold text-xl -mt-1">{200}</div>
+                <div className="font-bold text-xl -mt-1">
+                  {commaFy(this.FilteredData().length)}
+                </div>
               </div>
             </div>
           </div>
           {/* Body */}
-          <MainContainer className="mt-3">
-            <div className="border-b mb-3">
-              <div className="grid grid-cols-12 w-full">
-                <div className="col-span-12 lg:col-span-6">
-                  <div className="flex flex-row items-center gap-2">
-                    <div
-                      onClick={() => this.setState({ tabs: "SUMMARY" })}
-                      className={`px-6 py-2 border-b-2 ${
-                        this.state.tabs === "SUMMARY"
-                          ? "border-primary-700 text-primary-800 animate__animated animate__fadeIn"
-                          : "border-white hover:border-primary-700 hover:text-primary-800"
-                      } cursor-pointer`}
-                    >
-                      Summary
-                    </div>
-                    <div
-                      onClick={() => this.setState({ tabs: "POSITIONS" })}
-                      className={`px-6 py-2 border-b-2 ${
-                        this.state.tabs === "POSITIONS"
-                          ? "border-primary-700 text-primary-800 animate__animated animate__fadeIn"
-                          : "border-white hover:border-primary-700 hover:text-primary-800"
-                      } cursor-pointer`}
-                    >
-                      Positions
-                    </div>
-                  </div>
-                </div>
-                <div className="col-span-12 lg:col-span-6 flex flex-row items-center justify-end gap-2 pb-2 -mt-1">
-                  <div className="relative w-full">
-                    <input
-                      type="search"
-                      className="bg-gray-100 rounded-md px-3 py-2 w-full pl-10 text-base"
-                      placeholder="Search position"
-                      value={this.state.searchData}
-                      onChange={(e) =>
-                        this.setState({ searchData: e.target.value })
-                      }
-                    />
-                    <RiSearchLine
-                      className="absolute top-3 left-3 text-xl"
-                      style={{ marginTop: "-1.5px" }}
-                    />
-                  </div>
-                  {/* <div>
-                    <div className="bg-primary-700 hover:bg-primary-800 text-white px-3 py-2 rounded font-bold text-sm w-max cursor-pointer">
-                      Create position
-                    </div>
-                  </div> */}
-                  <ExportToExcel fileData={[]} fileName={"Positions report"} />
-                </div>
+          {this.state.loading === true ||
+          this.props.position.positions === null ? (
+            <div className="mt-8 bg-white rounded-md p-3">
+              <div>
+                {[1, 2, 3, 4, 5].map((item, i) => (
+                  <PositionItemLoading key={i + 1} className="animate-pulse" />
+                ))}
               </div>
             </div>
-            {this.state.tabs === "POSITIONS" && (
-              <div className="mt-6 animate__animated animate__fadeIn">
-                {this.FilteredData().length === 0 ? (
-                  <NoResultFound />
-                ) : (
-                  this.FilteredData().map((item, i) => (
-                    <PositionItem
-                      key={i + 1}
-                      position={item}
-                      onClick={() => {
-                        this.setState({ selectedPosition: "selected" });
-                      }}
+          ) : (
+            <MainContainer className="mt-3">
+              <div className="border-b mb-3">
+                <div className="grid grid-cols-12 w-full">
+                  <div className="col-span-12 lg:col-span-6">
+                    <div className="flex flex-row items-center gap-2">
+                      <div
+                        onClick={() => this.setState({ tabs: "SUMMARY" })}
+                        className={`px-6 py-2 border-b-2 ${
+                          this.state.tabs === "SUMMARY"
+                            ? "border-primary-700 text-primary-800 animate__animated animate__fadeIn"
+                            : "border-white hover:border-primary-700 hover:text-primary-800"
+                        } cursor-pointer`}
+                      >
+                        Summary
+                      </div>
+                      <div
+                        onClick={() => this.setState({ tabs: "POSITIONS" })}
+                        className={`px-6 py-2 border-b-2 ${
+                          this.state.tabs === "POSITIONS"
+                            ? "border-primary-700 text-primary-800 animate__animated animate__fadeIn"
+                            : "border-white hover:border-primary-700 hover:text-primary-800"
+                        } cursor-pointer`}
+                      >
+                        Positions
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-span-12 lg:col-span-6 flex flex-row items-center justify-end gap-2 pb-2 -mt-1">
+                    <SearchInput
+                      searchData={this.state.searchData}
+                      onChange={(value: string) =>
+                        this.setState({ searchData: value })
+                      }
                     />
-                  ))
-                )}
+                    <ExportToExcel
+                      fileData={this.props.position.positions}
+                      fileName={"Positions report"}
+                    />
+                  </div>
+                </div>
               </div>
-            )}
-          </MainContainer>
+              {this.state.tabs === "POSITIONS" && (
+                <div className="mt-6 animate__animated animate__fadeIn">
+                  {this.FilteredData().length === 0 ? (
+                    <NoResultFound />
+                  ) : (
+                    this.FilteredData().map((item, i) => (
+                      <PositionItem
+                        key={i + 1}
+                        position={item}
+                        onClick={() => {
+                          this.setState({ selectedPosition: item });
+                        }}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
+            </MainContainer>
+          )}
         </div>
-        {this.state.selectedPosition !== null && (
+        {this.getSelectedPosition() !== null && (
           <Modal
             backDrop={true}
             theme={Themes.default}
             close={() => this.setState({ selectedPosition: null })}
             backDropClose={true}
             widthSizeClass={ModalSize.maxWidth}
-            marginTop={ModalMarginTop.small}
+            marginTop={ModalMarginTop.none}
             displayClose={false}
             padding={{
               title: undefined,
@@ -173,11 +262,39 @@ class _PositionsManagement extends Component<
             }}
           >
             <PositionDetails
-              position={this.state.selectedPosition}
+              position={this.getSelectedPosition()!}
               onClose={() => this.setState({ selectedPosition: null })}
             />
           </Modal>
         )}
+        {this.state.openSelectUnit &&
+          this.props.position.positions !== null && (
+            <Modal
+              backDrop={true}
+              theme={Themes.default}
+              close={() => this.setState({ openSelectUnit: false })}
+              backDropClose={true}
+              widthSizeClass={ModalSize.extraLarge}
+              displayClose={false}
+              padding={{
+                title: undefined,
+                body: undefined,
+                footer: undefined,
+              }}
+            >
+              <SelectUnit
+                positionsCounter={this.props.position.positions.map((item) => ({
+                  position_id: item.position_id,
+                  employees_number: item.employee_number,
+                  unit_id: item.unit_id,
+                }))}
+                onSelect={(unit: UnitInterface | null) =>
+                  this.setState({ selectedUnit: unit, openSelectUnit: false })
+                }
+                onClose={() => this.setState({ openSelectUnit: false })}
+              />
+            </Modal>
+          )}
       </Fragment>
     );
   }
@@ -186,11 +303,18 @@ class _PositionsManagement extends Component<
 const mapStateToProps = ({
   auth,
   system,
-}: StoreState): { auth: Auth; system: System } => {
-  return { auth, system };
+  position,
+  units,
+}: StoreState): {
+  auth: Auth;
+  system: System;
+  position: PositionStore;
+  units: UnitStore;
+} => {
+  return { auth, system, position, units };
 };
 
-export const PositionsManagement = connect(
-  mapStateToProps,
-  {}
-)(_PositionsManagement);
+export const PositionsManagement = connect(mapStateToProps, {
+  FC_GetAllPositions,
+  FC_GetAllUnits,
+})(_PositionsManagement);

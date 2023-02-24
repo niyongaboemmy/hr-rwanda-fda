@@ -34,10 +34,12 @@ const Alert = (props: AlertProps) => {
       : "gray";
 
   useEffect(() => {
-    props.timeOut !== undefined &&
-      setTimeout(() => {
+    setTimeout(
+      () => {
         props.close();
-      }, props.timeOut);
+      },
+      props.timeOut === undefined ? 7000 : props.timeOut
+    );
   });
 
   return (

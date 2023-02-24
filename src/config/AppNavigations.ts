@@ -103,7 +103,9 @@ export const menus_categories = (): { key: MENU_TYPE; title: string }[] => {
           ? "Activities"
           : menu === MENU_TYPE.REPORTS
           ? "Reports"
-          : "Settings",
+          : menu === MENU_TYPE.SETTINGS
+          ? "Settings"
+          : "",
     });
   }
   return response.filter((element) =>

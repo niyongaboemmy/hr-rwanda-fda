@@ -3,15 +3,15 @@ import { Dispatch } from "redux";
 import { ActionTypes } from "./types";
 import { API_URL } from "../utils/api";
 import { setAxiosToken } from "../utils/AxiosToken";
-import { Access_Interface } from "./auth.action";
 import { errorToText } from "../utils/functions";
+import { UserAccessInterface, UserAccessList } from "../config/userAccess";
 
 /**
  * * ****************************** INTERFACES *****************************
  */
 
 export interface UserRoleInterface {
-  access: Access_Interface[];
+  access: UserAccessInterface[];
   role_id: string;
   role_name: string;
 }
@@ -47,9 +47,15 @@ export interface BasicInfo {
   }[];
 }
 
+export interface AccessListDetails {
+  access_key: UserAccessList;
+  access_name: string;
+}
+
 export interface System {
   side_nav: boolean;
   basic_info: BasicInfo | null;
+  access_details: AccessListDetails[] | null;
   error: string;
   success: string;
 }
@@ -58,6 +64,11 @@ export interface System {
 export interface GetSystemInfoAction {
   type: ActionTypes.GET_SYSTEM_BASIC_INFO;
   payload: BasicInfo;
+}
+
+export interface GetAccessListDetailsInfoAction {
+  type: ActionTypes.GET_ALL_ACCESS_DETAILS;
+  payload: AccessListDetails[];
 }
 
 export interface SetSystemErrorMessageAction {
@@ -89,6 +100,33 @@ export const FC_GetSystemInfo = (callback: (loading: boolean) => void) => {
 
       dispatch<GetSystemInfoAction>({
         type: ActionTypes.GET_SYSTEM_BASIC_INFO,
+        payload: res.data,
+      });
+      callback(false);
+    } catch (error: any) {
+      dispatch<SetSystemErrorMessageAction>({
+        type: ActionTypes.SET_SYSTEM_ERROR_MESSAGE,
+        payload: errorToText(error),
+      });
+      callback(false);
+      console.log("err: ", { ...error });
+    }
+  };
+};
+
+export const FC_GetSystemAccessDetails = (
+  callback: (loading: boolean) => void
+) => {
+  return async (dispatch: Dispatch) => {
+    callback(true);
+    setAxiosToken();
+    try {
+      const res = await axios.get<AccessListDetails[]>(`${API_URL}/access`);
+
+      console.log({ access_details: res.data });
+
+      dispatch<GetAccessListDetailsInfoAction>({
+        type: ActionTypes.GET_ALL_ACCESS_DETAILS,
         payload: res.data,
       });
       callback(false);

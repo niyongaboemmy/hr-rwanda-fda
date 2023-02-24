@@ -4,7 +4,7 @@ import { ActionTypes } from "./types";
 import { API_URL, DISTRICTS_LOCATION } from "../utils/api";
 import { APP_TOKEN_NAME, setAxiosToken } from "../utils/AxiosToken";
 import { errorToText } from "../utils/functions";
-import { UserAccessList } from "../config/userAccess";
+import { UserAccessInterface } from "../config/userAccess";
 
 /**
  * * ****************************** INTERFACES *****************************
@@ -47,18 +47,6 @@ export interface LocationAPI {
 
 const token = localStorage.getItem(APP_TOKEN_NAME);
 
-export interface Access_Interface {
-  access_name: string;
-  key: string;
-  permission: {
-    create: boolean;
-    update: boolean;
-    delete: boolean;
-    view: boolean;
-    export: boolean;
-  };
-}
-
 export interface EmploymentItem {
   employment_id: string;
   user_id: string;
@@ -68,16 +56,7 @@ export interface EmploymentItem {
   end_date: string | null;
   is_active: BooleanEnum;
   position_name: string;
-  access: {
-    key: UserAccessList;
-    permission: {
-      create: boolean;
-      update: boolean;
-      delete: boolean;
-      view: boolean;
-      export: boolean;
-    };
-  }[];
+  access: UserAccessInterface[];
 }
 
 export interface UserInterface {
@@ -145,16 +124,6 @@ export interface SwitchEmploymentAction {
 /**
  * * ****************************** ACTIONS *****************************
  */
-
-export const FormatAccessToObj = (access_name?: string) => {
-  return access_name === undefined
-    ? []
-    : (JSON.parse(access_name) as Access_Interface[]).map((item) => ({
-        access_name: item.access_name,
-        key: item.key,
-        permission: item.permission,
-      }));
-};
 
 export const FC_CleanUserDetails = () => {
   return (dispatch: Dispatch) => {

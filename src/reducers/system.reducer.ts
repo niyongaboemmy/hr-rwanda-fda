@@ -3,6 +3,7 @@ import { Action, ActionTypes, System } from "../actions";
 const defaultState: System = {
   side_nav: false,
   basic_info: null,
+  access_details: null,
   error: "",
   success: "",
 };
@@ -31,6 +32,11 @@ export const systemReducer = (state: System = defaultState, action: Action) => {
         ...state,
         success: action.payload,
         error: "",
+      };
+    case ActionTypes.GET_ALL_ACCESS_DETAILS:
+      return {
+        ...state,
+        access_details: action.payload,
       };
     default:
       return state;
