@@ -3,6 +3,7 @@ import { MdOutlineDashboard } from "react-icons/md";
 import { HiOutlineBriefcase, HiOutlineUser } from "react-icons/hi";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { UserAccessList } from "./userAccess";
+import { FaUsersCog } from "react-icons/fa";
 
 export enum MENU_TYPE {
   NONE = "NONE",
@@ -87,7 +88,15 @@ export const AUTHENTICATED_MENUS: SideNavigationInterface[] = [
     label: "Positions management",
     url: "/positions-management",
     menu_type: MENU_TYPE.ACTIVITIES,
-    access: "all",
+    access: UserAccessList.POSITIONS,
+  },
+  {
+    icon: FaUsersCog,
+    title: "Employees",
+    label: "Employees",
+    url: "/employees-management",
+    menu_type: MENU_TYPE.ACTIVITIES,
+    access: UserAccessList.EMPLOYEES_LIST,
   },
 ];
 

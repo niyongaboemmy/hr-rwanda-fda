@@ -62,7 +62,7 @@ export class SideNavBar extends Component<SideNavBarProps, SideNavBarState> {
                         isAccessAuthorized(
                           this.props.auth.selectedEmployment,
                           itm.access
-                        ))
+                        ).view === true)
                   )
                   .map((nav, i) => (
                     <NavLink

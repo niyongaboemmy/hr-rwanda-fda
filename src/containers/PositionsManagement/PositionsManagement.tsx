@@ -95,7 +95,7 @@ class _PositionsManagement extends Component<
     return "";
   };
   componentDidMount = () => {
-    if (this.props.units.units === null) {
+    if (this.props.position.positions === null) {
       this.setState({ loading: true });
       this.props.FC_GetAllPositions((loading: boolean, error: string) => {
         this.setState({ loading: loading, mainError: error });
