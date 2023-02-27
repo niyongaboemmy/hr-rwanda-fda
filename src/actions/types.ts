@@ -5,12 +5,20 @@ import {
   SwitchEmploymentAction,
 } from "./auth.action";
 import {
+  AddEmployeeBehaviorInfoAction,
+  AddEmployeeCustomAccessInfoAction,
+  GetAllEmployeesInfoAction,
+  GetEmployeeDetailsInfoAction,
+  RemoveEmployeeBehaviorInfoAction,
+} from "./employee.action";
+import {
   GetAllPositionsInfoAction,
   SetPositionCompetenciesAction,
   UpdatePositionAccessInfoAction,
 } from "./position.action";
 import {
   GetAccessListDetailsInfoAction,
+  GetBehaviorsListDetailsInfoAction,
   GetSystemInfoAction,
   SetSystemErrorMessageAction,
   SetSystemSuccessMessageAction,
@@ -31,6 +39,12 @@ export enum ActionTypes {
   GET_ALL_ACCESS_DETAILS = "GET_ALL_ACCESS_DETAILS",
   UPDATE_POSITION_ACCESS = "UPDATE_POSITION_ACCESS",
   SET_POSITION_COMPETENCIES = "SET_POSITION_COMPETENCIES",
+  GET_ALL_EMPLOYEES = "GET_ALL_EMPLOYEES",
+  GET_EMPLOYEE_DETAILS = "GET_EMPLOYEE_DETAILS",
+  REMOVE_EMPLOYEE_BEHAVIOR = "REMOVE_EMPLOYEE_BEHAVIOR",
+  ADD_EMPLOYEE_BEHAVIOR = "ADD_EMPLOYEE_BEHAVIOR",
+  GET_ALL_BEHAVIORS_DETAILS = "GET_ALL_BEHAVIORS_DETAILS",
+  ADD_EMPLOYEE_CUSTOM_ACCESS = "ADD_EMPLOYEE_CUSTOM_ACCESS",
 }
 
 export type Action =
@@ -45,4 +59,10 @@ export type Action =
   | GetAllUnitsInfoAction
   | GetAccessListDetailsInfoAction
   | UpdatePositionAccessInfoAction
-  | SetPositionCompetenciesAction;
+  | SetPositionCompetenciesAction
+  | GetAllEmployeesInfoAction
+  | GetEmployeeDetailsInfoAction
+  | RemoveEmployeeBehaviorInfoAction
+  | AddEmployeeBehaviorInfoAction
+  | GetBehaviorsListDetailsInfoAction
+  | AddEmployeeCustomAccessInfoAction;

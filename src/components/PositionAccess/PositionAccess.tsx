@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { BsCheckCircle } from "react-icons/bs";
-import { IoIosAddCircle, IoIosCloseCircleOutline } from "react-icons/io";
+import { IoIosAddCircle } from "react-icons/io";
 import { MdSettingsSuggest } from "react-icons/md";
 import { connect } from "react-redux";
 import { FC_GetSystemAccessDetails, System } from "../../actions";
 import { UserAccessInterface, UserAccessList } from "../../config/userAccess";
 import { StoreState } from "../../reducers";
+import AccessListTable from "../AccessListTable/AccessListTable";
 import { AssignPositionAccess } from "../AssignPositionAccess/AssignPositionAccess";
 import { NoResultFound } from "../Fragments/NoResultFound";
 import LoadingComponent from "../Loading/LoadingComponent";
@@ -24,18 +24,6 @@ interface PositionAccessState {
   addNewAccess: boolean;
   updateAccess: UserAccessInterface | null;
 }
-
-const ReturnBooleanStatusIcon = (status: boolean) => {
-  return (
-    <div>
-      {status === true ? (
-        <BsCheckCircle className="text-xl text-green-600" />
-      ) : (
-        <IoIosCloseCircleOutline className="text-2xl text-red-700" />
-      )}
-    </div>
-  );
-};
 
 class _PositionAccess extends Component<
   PositionAccessProps,
@@ -120,56 +108,14 @@ class _PositionAccess extends Component<
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
-              <table className="min-w-full text-sm text-left">
-                <thead>
-                  <tr>
-                    <th className="px-3 py-2">#</th>
-                    <th className="px-3 py-2">Access</th>
-                    <th className="px-3 py-2">View</th>
-                    <th className="px-3 py-2">Create</th>
-                    <th className="px-3 py-2">Update</th>
-                    <th className="px-3 py-2">Delete</th>
-                    <th className="px-3 py-2">Export</th>
-                    <th className="px-1 py-1"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.props.access.map((item, i) => (
-                    <tr>
-                      <td className="px-3 py-2">{i + 1}</td>
-                      <td className="px-3 py-2">
-                        {this.getAccessName(item.key)}
-                      </td>
-                      <td className="px-3 py-2">
-                        {ReturnBooleanStatusIcon(item.permission.view)}
-                      </td>
-                      <td className="px-3 py-2">
-                        {ReturnBooleanStatusIcon(item.permission.create)}
-                      </td>
-                      <td className="px-3 py-2">
-                        {ReturnBooleanStatusIcon(item.permission.update)}
-                      </td>
-                      <td className="px-3 py-2">
-                        {ReturnBooleanStatusIcon(item.permission.delete)}
-                      </td>
-                      <td className="px-3 py-2">
-                        {ReturnBooleanStatusIcon(item.permission.export)}
-                      </td>
-                      <td className="px-1 py-1 w-10">
-                        <div
-                          onClick={() => {
-                            this.setState({ updateAccess: item });
-                            this.props.onUpdate(true);
-                          }}
-                          className="bg-white border border-yellow-200 hover:text-yellow-600 rounded-md px-2 py-2 w-max cursor-pointer font-semibold"
-                        >
-                          Update
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <AccessListTable
+                access={this.props.access}
+                getAccessName={this.getAccessName}
+                onUpdate={(item: UserAccessInterface) => {
+                  this.setState({ updateAccess: item });
+                  this.props.onUpdate(true);
+                }}
+              />
               <div
                 onClick={() => {
                   this.setState({ addNewAccess: true });

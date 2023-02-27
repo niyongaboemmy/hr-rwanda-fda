@@ -83,13 +83,13 @@ class _App extends Component<AppProps, AppState> {
               },
             });
           if (status === true) {
-            if (this.props.system.basic_info === null) {
-              this.props.FC_GetSystemInfo((loading: boolean) => {
-                this.setState({ redirect: true });
-              });
-            } else {
-              this.setState({ redirect: true });
-            }
+            // if (this.props.system.basic_info === null) {
+            //   this.props.FC_GetSystemInfo((loading: boolean) => {
+            //     this.setState({ redirect: true });
+            //   });
+            // } else {
+            this.setState({ redirect: true });
+            // }
           } else {
             this.setState({ loading: false });
           }

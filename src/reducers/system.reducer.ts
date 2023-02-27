@@ -19,7 +19,21 @@ export const systemReducer = (state: System = defaultState, action: Action) => {
     case ActionTypes.GET_SYSTEM_BASIC_INFO:
       return {
         ...state,
-        basic_info: action.payload,
+        basic_info: {
+          behavior:
+            state.basic_info === null || action.payload.behavior === undefined
+              ? state.basic_info !== null &&
+                state.basic_info.behavior.length > 0
+                ? state.basic_info.behavior
+                : []
+              : action.payload.behavior,
+          competency_classification: action.payload.competency_classification,
+          competency_function: action.payload.competency_function,
+          competency_type: action.payload.competency_type,
+          domain: action.payload.domain,
+          job_family: action.payload.job_family,
+          proficiency_level: action.payload.proficiency_level,
+        },
       };
     case ActionTypes.SET_SYSTEM_ERROR_MESSAGE:
       return {
@@ -37,6 +51,28 @@ export const systemReducer = (state: System = defaultState, action: Action) => {
       return {
         ...state,
         access_details: action.payload,
+      };
+    case ActionTypes.GET_ALL_BEHAVIORS_DETAILS:
+      return {
+        ...state,
+        basic_info: {
+          behavior: action.payload,
+          competency_classification:
+            state.basic_info === null
+              ? []
+              : state.basic_info.competency_classification,
+          competency_function:
+            state.basic_info === null
+              ? []
+              : state.basic_info.competency_function,
+          competency_type:
+            state.basic_info === null ? [] : state.basic_info.competency_type,
+          domain: state.basic_info === null ? [] : state.basic_info.domain,
+          job_family:
+            state.basic_info === null ? [] : state.basic_info.job_family,
+          proficiency_level:
+            state.basic_info === null ? [] : state.basic_info.proficiency_level,
+        },
       };
     default:
       return state;

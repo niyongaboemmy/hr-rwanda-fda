@@ -54,6 +54,13 @@ const PositionsManagement = lazy(() =>
     })
   )
 );
+const EmployeesManagement = lazy(() =>
+  import("./containers/EmployeesManagement/EmployeesManagement").then(
+    ({ EmployeesManagement }) => ({
+      default: EmployeesManagement,
+    })
+  )
+);
 
 //* Interfaces
 // props for the component
@@ -89,13 +96,13 @@ class _App extends React.Component<AppProps, AppState> {
     this.props.FC_CheckLoggedIn((status: boolean) => {
       if (status === true) {
         // Check if basic info loaded
-        if (this.props.system.basic_info === null) {
-          this.props.FC_GetSystemInfo((loading: boolean) => {
-            this.setState({ loading: loading });
-          });
-        } else {
-          this.setState({ loading: false });
-        }
+        // if (this.props.system.basic_info === null) {
+        //   this.props.FC_GetSystemInfo((loading: boolean) => {
+        //     this.setState({ loading: loading });
+        //   });
+        // } else {
+        this.setState({ loading: false });
+        // }
       }
     });
   }
@@ -226,6 +233,19 @@ class _App extends React.Component<AppProps, AppState> {
                       <ProtectedRoute
                         path="/positions-management"
                         component={PositionsManagement}
+                        isAuthenticated={this.props.auth.isAuthenticated}
+                        authenticationPath={authenticationPath}
+                        loading={this.state.loading}
+                        exact
+                      />
+                    )}
+                    {isAccessAuthorized(
+                      this.props.auth.selectedEmployment,
+                      UserAccessList.EMPLOYEES_LIST
+                    ).view === true && (
+                      <ProtectedRoute
+                        path="/employees-management"
+                        component={EmployeesManagement}
                         isAuthenticated={this.props.auth.isAuthenticated}
                         authenticationPath={authenticationPath}
                         loading={this.state.loading}

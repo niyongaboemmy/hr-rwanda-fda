@@ -61,6 +61,22 @@ export interface PositionInterface {
   competency?: PositionCompetencyInterface[];
 }
 
+export interface PositionDetailsInterface {
+  access: UserAccessInterface[];
+  competencies: PositionCompetencyInterface[];
+  employment_id: string;
+  end_date: string | null;
+  is_acting: BooleanEnum;
+  is_active: BooleanEnum;
+  is_line_manager: BooleanEnum;
+  position_id: 1;
+  position_name: string;
+  start_date: string;
+  unit_id: string;
+  unit_name: string;
+  user_id: string;
+}
+
 export interface PositionStore {
   positions: PositionInterface[] | null;
 }

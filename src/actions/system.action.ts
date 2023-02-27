@@ -16,11 +16,13 @@ export interface UserRoleInterface {
   role_name: string;
 }
 
+export interface BehaviorItemInterface {
+  behavior_id: string;
+  behavior_name: string;
+}
+
 export interface BasicInfo {
-  behavior: {
-    behavior_id: string;
-    behavior_name: string;
-  }[];
+  behavior: BehaviorItemInterface[];
   competency_classification: {
     competency_classification_id: string;
     classification_name: string;
@@ -69,6 +71,11 @@ export interface GetSystemInfoAction {
 export interface GetAccessListDetailsInfoAction {
   type: ActionTypes.GET_ALL_ACCESS_DETAILS;
   payload: AccessListDetails[];
+}
+
+export interface GetBehaviorsListDetailsInfoAction {
+  type: ActionTypes.GET_ALL_BEHAVIORS_DETAILS;
+  payload: BehaviorItemInterface[];
 }
 
 export interface SetSystemErrorMessageAction {
@@ -127,6 +134,35 @@ export const FC_GetSystemAccessDetails = (
 
       dispatch<GetAccessListDetailsInfoAction>({
         type: ActionTypes.GET_ALL_ACCESS_DETAILS,
+        payload: res.data,
+      });
+      callback(false);
+    } catch (error: any) {
+      dispatch<SetSystemErrorMessageAction>({
+        type: ActionTypes.SET_SYSTEM_ERROR_MESSAGE,
+        payload: errorToText(error),
+      });
+      callback(false);
+      console.log("err: ", { ...error });
+    }
+  };
+};
+
+export const FC_GetSystemBehaviorsListDetails = (
+  callback: (loading: boolean) => void
+) => {
+  return async (dispatch: Dispatch) => {
+    callback(true);
+    setAxiosToken();
+    try {
+      const res = await axios.get<BehaviorItemInterface[]>(
+        `${API_URL}/behavior`
+      );
+
+      console.log({ access_details: res.data });
+
+      dispatch<GetBehaviorsListDetailsInfoAction>({
+        type: ActionTypes.GET_ALL_BEHAVIORS_DETAILS,
         payload: res.data,
       });
       callback(false);

@@ -20,6 +20,14 @@ export enum UserActiveStatus {
   DISABLED = "DISABLED",
 }
 
+export interface PermissionInterface {
+  view: boolean;
+  create: boolean;
+  update: boolean;
+  delete: boolean;
+  export: boolean;
+}
+
 export interface DistrictLocationItem {
   district_code: string;
   district_name: string;

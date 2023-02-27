@@ -252,7 +252,7 @@ class _PositionsManagement extends Component<
             theme={Themes.default}
             close={() => this.setState({ selectedPosition: null })}
             backDropClose={true}
-            widthSizeClass={ModalSize.maxWidth}
+            widthSizeClass={ModalSize.extraExtraLarge}
             marginTop={ModalMarginTop.none}
             displayClose={false}
             padding={{

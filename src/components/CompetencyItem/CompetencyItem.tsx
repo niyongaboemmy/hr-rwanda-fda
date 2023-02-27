@@ -3,25 +3,7 @@ import { PositionCompetencyFormatInterface } from "../../actions";
 import { BiLike } from "react-icons/bi";
 import { NoResultFound } from "../Fragments/NoResultFound";
 import { BsCheckCircle } from "react-icons/bs";
-
-export const ProficiencyLevelComponent = (props: {
-  proficiency_level_id: string;
-  proficiency_name: string;
-}): JSX.Element => {
-  return (
-    <div
-      className={`text-sm px-2 py-0 rounded-full font-light w-max ${
-        props.proficiency_level_id.toString() === "3"
-          ? "bg-green-100 text-green-700"
-          : props.proficiency_level_id.toString() === "2"
-          ? "bg-gray-500 text-white"
-          : "bg-red-100 text-red-700"
-      }`}
-    >
-      {props.proficiency_name}
-    </div>
-  );
-};
+import { ProficiencyLevelComponent } from "./CompetencyItemEvaluation";
 
 const CompetencyItem = (props: {
   competency: PositionCompetencyFormatInterface;
@@ -44,7 +26,7 @@ const CompetencyItem = (props: {
                 props.competency.behaviors.map((behavior, b) => (
                   <div
                     key={b + 1}
-                    className="flex flex-row items-center justify-between gap-3 w-full"
+                    className="flex flex-row items-center justify-between gap-3 w-full mb-2"
                   >
                     <div className="flex flex-row items-center gap-2">
                       <div>
