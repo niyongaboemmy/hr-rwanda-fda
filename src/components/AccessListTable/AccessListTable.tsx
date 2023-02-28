@@ -19,6 +19,7 @@ const AccessListTable = (props: {
   access: UserAccessInterface[];
   getAccessName: (value: UserAccessList) => string;
   onUpdate?: (item: UserAccessInterface) => void;
+  onDelete?: (item: UserAccessInterface) => void;
   size?: "small" | "medium";
 }) => {
   return (
@@ -68,6 +69,18 @@ const AccessListTable = (props: {
                   className="bg-white border border-yellow-200 hover:text-yellow-600 rounded-md px-2 py-2 w-max cursor-pointer font-semibold"
                 >
                   Update
+                </div>
+              </td>
+            )}
+            {props.onDelete !== undefined && (
+              <td className="px-1 py-1 w-10">
+                <div
+                  onClick={() =>
+                    props.onDelete !== undefined && props.onDelete(item)
+                  }
+                  className="bg-white border border-red-200 hover:text-red-600 rounded-md px-2 py-2 w-max cursor-pointer font-semibold"
+                >
+                  Delete
                 </div>
               </td>
             )}

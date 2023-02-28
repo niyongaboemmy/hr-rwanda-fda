@@ -1,14 +1,10 @@
 import axios from "axios";
 import { Dispatch } from "redux";
-import { UserAccessInterface, UserAccessList } from "../config/userAccess";
+import { UserAccessInterface } from "../config/userAccess";
 import { API_URL } from "../utils/api";
 import { setAxiosToken } from "../utils/AxiosToken";
 import { errorToText } from "../utils/functions";
-import {
-  BooleanEnum,
-  PermissionInterface,
-  UserActiveStatus,
-} from "./auth.action";
+import { BooleanEnum, UserActiveStatus } from "./auth.action";
 import { PositionDetailsInterface } from "./position.action";
 import {
   SetSystemErrorMessageAction,
@@ -84,10 +80,7 @@ export interface EmployeeDetailsInterface {
 
 export interface EmployeeCustomAccessDataInterface {
   user_id: string;
-  access: {
-    key: UserAccessList;
-    permission: PermissionInterface;
-  }[];
+  access: UserAccessInterface[];
   start_date: string;
   end_date: string;
   reason: string;
@@ -108,6 +101,13 @@ export interface RemoveEmployeeBehaviorInfoAction {
   type: ActionTypes.REMOVE_EMPLOYEE_BEHAVIOR;
   payload: {
     behavior_id: string;
+  };
+}
+
+export interface RemoveEmployeeCustomAccessInfoAction {
+  type: ActionTypes.REMOVE_EMPLOYEE_CUSTOM_ACCESS;
+  payload: {
+    custom_access_id: string;
   };
 }
 
@@ -212,7 +212,7 @@ export const FC_GetEmployeeDetails = (
 };
 
 export const FC_RemoveEmployeeBehavior = (
-  user_competency_id: string,
+  user_behavior_id: string,
   callback: (loading: boolean, error: string) => void
 ) => {
   return async (dispatch: Dispatch) => {
@@ -220,13 +220,13 @@ export const FC_RemoveEmployeeBehavior = (
     setAxiosToken();
     try {
       const res = await axios.patch(`${API_URL}/user/behavior`, {
-        user_competency_id: user_competency_id,
+        user_behavior_id: user_behavior_id,
       });
       console.log({ removeEmployeeBehavior: res.data });
       dispatch<RemoveEmployeeBehaviorInfoAction>({
         type: ActionTypes.REMOVE_EMPLOYEE_BEHAVIOR,
         payload: {
-          behavior_id: user_competency_id,
+          behavior_id: user_behavior_id,
         },
       });
       dispatch<SetSystemSuccessMessageAction>({
@@ -292,6 +292,43 @@ export const FC_AddEmployeeCustomAccess = (
       dispatch<SetSystemSuccessMessageAction>({
         type: ActionTypes.SET_SYSTEM_SUCCESS_MESSAGE,
         payload: "Employee custom access has added successfully!",
+      });
+      callback(false, "");
+    } catch (error: any) {
+      dispatch<SetSystemErrorMessageAction>({
+        type: ActionTypes.SET_SYSTEM_ERROR_MESSAGE,
+        payload: errorToText(error),
+      });
+      callback(false, errorToText(error));
+      console.log("err: ", { ...error });
+    }
+  };
+};
+
+export const FC_RemoveEmployeeCustomAccess = (
+  custom_access_id: string,
+  callback: (loading: boolean, error: string) => void
+) => {
+  return async (dispatch: Dispatch) => {
+    callback(true, "");
+    setAxiosToken();
+    try {
+      const res = await axios.patch(
+        `${API_URL}/custom/access/${custom_access_id}`,
+        {
+          custom_access_id: custom_access_id,
+        }
+      );
+      console.log({ removeEmployeeCustomAccess: res.data });
+      dispatch<RemoveEmployeeCustomAccessInfoAction>({
+        type: ActionTypes.REMOVE_EMPLOYEE_CUSTOM_ACCESS,
+        payload: {
+          custom_access_id: custom_access_id,
+        },
+      });
+      dispatch<SetSystemSuccessMessageAction>({
+        type: ActionTypes.SET_SYSTEM_SUCCESS_MESSAGE,
+        payload: "Employee custom access has removed successfully!",
       });
       callback(false, "");
     } catch (error: any) {

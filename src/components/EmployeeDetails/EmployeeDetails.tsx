@@ -9,6 +9,7 @@ import { connect } from "react-redux";
 import {
   AddEmployeeBehaviorDataInterface,
   BooleanEnum,
+  EmployeeCustomAccessDataInterface,
   EmployeeDetailsInterface,
   EmployeeListInterface,
   EmployeePositionItem,
@@ -16,6 +17,7 @@ import {
   FC_GetEmployeeDetails,
   FC_GetSystemAccessDetails,
   FC_RemoveEmployeeBehavior,
+  FC_RemoveEmployeeCustomAccess,
   GetPositionFormattedCompetency,
   PermissionInterface,
   PositionDetailsInterface,
@@ -26,6 +28,7 @@ import { UserAccessInterface, UserAccessList } from "../../config/userAccess";
 import { StoreState } from "../../reducers";
 import AccessListTable from "../AccessListTable/AccessListTable";
 import { AddEmployeeBehavior } from "../AddEmployeeBehavior/AddEmployeeBehavior";
+import { AddEmployeeCustomAccess } from "../AddEmployeeCustomAccess/AddEmployeeCustomAccess";
 import Alert, { AlertType } from "../Alert/Alert";
 import CompetencyItemEvaluation, {
   ProficiencyLevelComponent,
@@ -33,6 +36,12 @@ import CompetencyItemEvaluation, {
 import BackButton from "../Fragments/BackButton";
 import { NoResultFound } from "../Fragments/NoResultFound";
 import Loading from "../Loading/Loading";
+import {
+  AccessLoading,
+  EmployeeBehaviorLoading,
+  InfoLoading,
+  PositionCompetencyLoading,
+} from "../Loading/LoadingComponentTypes";
 
 interface EmployeeDetailsProps {
   employee: EmployeeListInterface;
@@ -57,6 +66,10 @@ interface EmployeeDetailsProps {
     user_behavior_id: string,
     callback: (loading: boolean, error: string) => void
   ) => void;
+  FC_RemoveEmployeeCustomAccess: (
+    custom_access_id: string,
+    callback: (loading: boolean, error: string) => void
+  ) => void;
   employeeBehaviorPermission: PermissionInterface;
   employeeCustomAccess: PermissionInterface;
 }
@@ -69,6 +82,7 @@ interface EmployeeDetailsState {
   success: string;
   loadingAccessNames: boolean;
   removing_behavior: string;
+  removing_custom_access: boolean;
   actionReturn: "AddEmployeeBehavior" | "AddEmployeeCustomAccess" | null;
 }
 
@@ -89,6 +103,7 @@ class _EmployeeDetails extends Component<
       removing_behavior: "",
       success: "",
       actionReturn: null,
+      removing_custom_access: false,
     };
   }
   getAccessName = (access_key: UserAccessList) => {
@@ -98,6 +113,17 @@ class _EmployeeDetails extends Component<
       );
       if (response !== undefined) {
         return response.access_name;
+      }
+    }
+    return "Wait...";
+  };
+  getUnitName = (unit_id: string) => {
+    if (this.props.units.units !== null) {
+      const response = this.props.units.units.find(
+        (itm) => itm.unit_id.toString() === unit_id.toString()
+      );
+      if (response !== undefined) {
+        return response.unit_name;
       }
     }
     return "Wait...";
@@ -153,6 +179,45 @@ class _EmployeeDetails extends Component<
                 positions: this.state.positionData.positions,
               },
               success: "Employee behavior has removed successfully!",
+            });
+          }
+        }
+      );
+    }
+  };
+  removeEmployeeCustomAccess = (
+    custom_access_id: string,
+    access_name: string
+  ) => {
+    if (
+      window.confirm(
+        "Are you sure do you want to remove this access " + access_name + "?"
+      ) === true
+    ) {
+      this.setState({ removing_custom_access: true });
+      this.props.FC_RemoveEmployeeCustomAccess(
+        custom_access_id,
+        (loading: boolean, error: string) => {
+          this.setState({
+            removing_custom_access: loading,
+            error: error,
+          });
+          if (
+            error === "" &&
+            loading === false &&
+            this.state.positionData !== null
+          ) {
+            this.setState({
+              positionData: {
+                ...this.state.positionData,
+                employee_custom_access:
+                  this.state.positionData.employee_custom_access.filter(
+                    (itm) =>
+                      itm.custom_access_id.toString() !==
+                      custom_access_id.toString()
+                  ),
+              },
+              success: "Employee custom access has removed successfully!",
             });
           }
         }
@@ -223,12 +288,23 @@ class _EmployeeDetails extends Component<
             onCreated={(data: AddEmployeeBehaviorDataInterface) =>
               this.LoadEmployeeDetails()
             }
+            employee={this.props.employee}
           />
         </div>
       );
     }
     if (this.state.actionReturn === "AddEmployeeCustomAccess") {
-      return <div>{/* Continue here */}</div>;
+      return (
+        <div>
+          <AddEmployeeCustomAccess
+            onCancel={() => this.setState({ actionReturn: null })}
+            employee={this.props.employee}
+            onCreated={(data: EmployeeCustomAccessDataInterface) => {
+              this.LoadEmployeeDetails();
+            }}
+          />
+        </div>
+      );
     }
     return (
       <div>
@@ -259,11 +335,7 @@ class _EmployeeDetails extends Component<
           )}
         </div>
         {/* Details */}
-        {this.state.loading === true || this.props.units.units === undefined ? (
-          <div className="pt-6 px-4">
-            <Loading />
-          </div>
-        ) : (
+        {
           <div
             className="pt-4 px-2 md:px-4 overflow-y-auto"
             style={{ height: "calc(100vh - 80px)" }}
@@ -362,7 +434,13 @@ class _EmployeeDetails extends Component<
                           {this.props.employee.residence}
                         </span>
                       </div>
-                      {this.state.positionData !== null &&
+                      {this.state.loadingAccessNames === true ||
+                      this.state.positionData === null ? (
+                        <div className="col-span-12 lg:col-span-12 flex flex-col">
+                          <AccessLoading />
+                        </div>
+                      ) : (
+                        this.state.positionData !== null &&
                         this.state.positionData.employee_custom_access.length >
                           0 && (
                           <div className="col-span-12 lg:col-span-12 flex flex-col pt-4">
@@ -380,20 +458,63 @@ class _EmployeeDetails extends Component<
                                 <NoResultFound />
                               ) : (
                                 <div className="w-full overflow-x-auto">
-                                  {this.state.loadingAccessNames === true ? (
-                                    <Loading />
+                                  {this.state.removing_custom_access ===
+                                  true ? (
+                                    <div className="flex flex-col items-center justify-center w-full bg-gray-100 rounded-md p-3 py-4">
+                                      <div>
+                                        <AiOutlineLoading3Quarters className="text-3xl animate-spin text-yellow-500" />
+                                      </div>
+                                      <div className="animate__animated animate__fadeIn animate__infinite font-light text-base">
+                                        Removing access...
+                                      </div>
+                                    </div>
                                   ) : (
                                     <AccessListTable
                                       access={this.getCustomAccessList()}
                                       getAccessName={this.getAccessName}
                                       size={"small"}
+                                      onDelete={
+                                        this.props.employeeCustomAccess
+                                          .update === false
+                                          ? undefined
+                                          : (item: UserAccessInterface) => {
+                                              if (
+                                                this.state.positionData !== null
+                                              ) {
+                                                const customAccessSelected =
+                                                  this.state.positionData.employee_custom_access.find(
+                                                    (itm) =>
+                                                      itm.access.find(
+                                                        (itm) =>
+                                                          itm.key === item.key
+                                                      ) !== undefined
+                                                  );
+                                                if (
+                                                  customAccessSelected !==
+                                                  undefined
+                                                ) {
+                                                  this.removeEmployeeCustomAccess(
+                                                    customAccessSelected.custom_access_id,
+                                                    item.key
+                                                  ); //Need to be improved: Create a popup containing list of custom access and their description
+                                                }
+                                              }
+                                            }
+                                      }
                                     />
                                   )}
                                 </div>
                               )}
                               {this.props.employeeCustomAccess.create ===
                                 true && (
-                                <div className="bg-primary-50 text-primary-800 px-3 pl-2 py-2 w-full flex flex-row items-center gap-2 rounded text-base cursor-pointer hover:bg-primary-100 hover:text-primary-900 mt-3 group">
+                                <div
+                                  onClick={() =>
+                                    this.setState({
+                                      actionReturn: "AddEmployeeCustomAccess",
+                                    })
+                                  }
+                                  className="bg-primary-50 text-primary-800 px-3 pl-2 py-2 w-full flex flex-row items-center gap-2 rounded text-base cursor-pointer hover:bg-primary-100 hover:text-primary-900 mt-3 group"
+                                >
                                   <div>
                                     <IoIosAddCircleOutline className="text-2xl text-primary-700" />
                                   </div>
@@ -402,7 +523,8 @@ class _EmployeeDetails extends Component<
                               )}
                             </div>
                           </div>
-                        )}
+                        )
+                      )}
                     </div>
                   </div>
                 </div>
@@ -411,11 +533,7 @@ class _EmployeeDetails extends Component<
                 <div className="border border-primary-300 rounded-md p-3 px-4 h-full">
                   {this.state.loadingData === true ? (
                     <div className="flex flex-col items-center justify-center w-full text-center">
-                      {/* <div className="my-3">
-                        <AiOutlineLoading3Quarters className="text-6xl text-yellow-500 animate-spin" />
-                      </div>
-                      <div className="font-light text-lg">Loading...</div> */}
-                      <Loading />
+                      <InfoLoading />
                     </div>
                   ) : (
                     <div>
@@ -448,13 +566,13 @@ class _EmployeeDetails extends Component<
                             <span className="text-sm text-gray-500">
                               Position name
                             </span>
-                            <span className="font-semibold">
+                            <span className="font-semibold text-sm">
                               {this.props.activeEmployeePosition?.position_name}
                             </span>
                           </div>
                           <div className="col-span-12 lg:col-span-6 flex flex-col">
                             <span className="text-sm text-gray-500">Unit</span>
-                            <span className="font-semibold">
+                            <span className="font-semibold text-sm">
                               {this.props.activeEmployeePosition?.unit_name}
                             </span>
                           </div>
@@ -462,7 +580,12 @@ class _EmployeeDetails extends Component<
                             <span className="text-sm text-gray-500">
                               Reporting Unit
                             </span>
-                            <span className="font-semibold">{"Missing"}</span>
+                            <span className="font-semibold text-sm">
+                              {selectedActivePositionDetails !== undefined &&
+                                this.getUnitName(
+                                  selectedActivePositionDetails.report_unit_id
+                                )}
+                            </span>
                           </div>
                           <div className="col-span-12 lg:col-span-6 flex flex-col">
                             <span className="text-sm text-gray-500">
@@ -493,7 +616,7 @@ class _EmployeeDetails extends Component<
                               ) : (
                                 <div className="w-full overflow-x-auto">
                                   {this.state.loadingAccessNames === true ? (
-                                    <Loading />
+                                    <AccessLoading />
                                   ) : (
                                     <AccessListTable
                                       access={
@@ -511,13 +634,17 @@ class _EmployeeDetails extends Component<
                       </div>
                     </div>
                   )}
+                  {this.state.loadingAccessNames === true && <AccessLoading />}
                 </div>
               </div>
               <div className="col-span-12 md:col-span-6 h-full">
                 <div className="border border-primary-300 rounded-md p-3 px-4 h-full">
                   {this.state.loadingData === true ? (
-                    <div className="flex flex-col items-center justify-center w-full text-center">
-                      <Loading />
+                    <div className="">
+                      <div className="font-bold text-lg mb-2">
+                        Employee behaviors
+                      </div>
+                      <EmployeeBehaviorLoading />
                     </div>
                   ) : (
                     <div>
@@ -611,8 +738,11 @@ class _EmployeeDetails extends Component<
               <div className="col-span-12 md:col-span-6 h-full">
                 <div className="border border-primary-300 rounded-md p-3 px-4 h-full">
                   {this.state.loadingData === true ? (
-                    <div className="flex flex-col items-center justify-center w-full text-center">
-                      <Loading />
+                    <div className="">
+                      <div className="font-bold text-lg mb-2">
+                        Position competency benchmarking
+                      </div>
+                      <PositionCompetencyLoading />
                     </div>
                   ) : (
                     <div>
@@ -733,7 +863,7 @@ class _EmployeeDetails extends Component<
               </div>
             </div>
           </div>
-        )}
+        }
       </div>
     );
   }
@@ -754,4 +884,5 @@ export const EmployeeDetails = connect(mapStateToProps, {
   FC_GetEmployeeDetails,
   FC_GetSystemAccessDetails,
   FC_RemoveEmployeeBehavior,
+  FC_RemoveEmployeeCustomAccess,
 })(_EmployeeDetails);

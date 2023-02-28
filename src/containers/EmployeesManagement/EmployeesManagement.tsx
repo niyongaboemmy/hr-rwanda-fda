@@ -30,6 +30,17 @@ import { IoMdRefreshCircle } from "react-icons/io";
 import { FaUsersCog } from "react-icons/fa";
 import { EmployeeDetails } from "../../components/EmployeeDetails/EmployeeDetails";
 import { isAccessAuthorized, UserAccessList } from "../../config/userAccess";
+import ActionMenu from "./ActionMenu";
+import { EmployeePositions } from "./EmployeePositions";
+
+export enum EmployeeActionTypes {
+  DETAILS = "DETAILS",
+  POSITIONS = "POSITIONS",
+  TRAINING = "TRAINING",
+  LEAVE = "LEAVE",
+  TRAVEL = "TRAVEL",
+  TERMINATE = "TERMINATE",
+}
 
 interface EmployeesManagementProps {
   auth: Auth;
@@ -48,6 +59,8 @@ interface EmployeesManagementState {
   searchData: string;
   mainError: string;
   openSelectUnit: boolean;
+  openMenu: EmployeeListInterface | null;
+  open: EmployeeActionTypes | null;
 }
 
 class _EmployeesManagement extends Component<
@@ -65,6 +78,8 @@ class _EmployeesManagement extends Component<
       searchData: "",
       mainError: "",
       openSelectUnit: false,
+      open: null,
+      openMenu: null,
     };
   }
   FilteredData = () => {
@@ -132,6 +147,7 @@ class _EmployeesManagement extends Component<
     }
     return null;
   };
+
   render() {
     return (
       <Fragment>
@@ -298,9 +314,7 @@ class _EmployeesManagement extends Component<
                               key={i + 1}
                               className="hover:bg-primary-50 hover:text-primary-800 cursor-pointer group"
                               title="Click to view details for selected employee"
-                              onClick={() =>
-                                this.setState({ selectedEmployee: item })
-                              }
+                              onClick={() => this.setState({ openMenu: item })}
                             >
                               <td className="px-2 py-2 border">{i + 1}</td>
                               <td className="px-2 py-2 border truncate">
@@ -353,38 +367,40 @@ class _EmployeesManagement extends Component<
             </MainContainer>
           )}
         </div>
-        {this.getSelectedEmployee() !== null && (
-          <Modal
-            backDrop={true}
-            theme={Themes.default}
-            close={() => this.setState({ selectedEmployee: null })}
-            backDropClose={true}
-            widthSizeClass={ModalSize.extraExtraLarge}
-            marginTop={ModalMarginTop.none}
-            displayClose={false}
-            padding={{
-              title: undefined,
-              body: undefined,
-              footer: undefined,
-            }}
-          >
-            <EmployeeDetails
-              employee={this.getSelectedEmployee()!}
-              onClose={() => this.setState({ selectedEmployee: null })}
-              activeEmployeePosition={this.employeeActivePosition(
-                this.getSelectedEmployee()!.positions
-              )}
-              employeeBehaviorPermission={isAccessAuthorized(
-                this.props.auth.selectedEmployment,
-                UserAccessList.EMPLOYEE_BEHAVIORS
-              )}
-              employeeCustomAccess={isAccessAuthorized(
-                this.props.auth.selectedEmployment,
-                UserAccessList.EMPLOYEES_LIST
-              )}
-            />
-          </Modal>
-        )}
+        {this.getSelectedEmployee() !== null &&
+          this.state.openMenu === null &&
+          this.state.open === null && (
+            <Modal
+              backDrop={true}
+              theme={Themes.default}
+              close={() => this.setState({ selectedEmployee: null })}
+              backDropClose={true}
+              widthSizeClass={ModalSize.extraExtraLarge}
+              marginTop={ModalMarginTop.none}
+              displayClose={false}
+              padding={{
+                title: undefined,
+                body: undefined,
+                footer: undefined,
+              }}
+            >
+              <EmployeeDetails
+                employee={this.getSelectedEmployee()!}
+                onClose={() => this.setState({ selectedEmployee: null })}
+                activeEmployeePosition={this.employeeActivePosition(
+                  this.getSelectedEmployee()!.positions
+                )}
+                employeeBehaviorPermission={isAccessAuthorized(
+                  this.props.auth.selectedEmployment,
+                  UserAccessList.EMPLOYEE_BEHAVIORS
+                )}
+                employeeCustomAccess={isAccessAuthorized(
+                  this.props.auth.selectedEmployment,
+                  UserAccessList.EMPLOYEES_LIST
+                )}
+              />
+            </Modal>
+          )}
         {this.state.openSelectUnit &&
           this.props.employee.employees !== null && (
             <Modal
@@ -411,6 +427,80 @@ class _EmployeesManagement extends Component<
                   this.setState({ selectedUnit: unit, openSelectUnit: false })
                 }
                 onClose={() => this.setState({ openSelectUnit: false })}
+              />
+            </Modal>
+          )}
+        {this.state.openMenu !== null && this.state.open === null && (
+          <Modal
+            backDrop={true}
+            theme={Themes.default}
+            close={() => this.setState({ openMenu: null })}
+            backDropClose={true}
+            widthSizeClass={ModalSize.large}
+            displayClose={false}
+            padding={{
+              title: undefined,
+              body: undefined,
+              footer: undefined,
+            }}
+          >
+            <ActionMenu
+              employee={this.state.openMenu}
+              onGoBack={() =>
+                this.setState({ openMenu: null, selectedEmployee: null })
+              }
+              onSelect={(action: EmployeeActionTypes) => {
+                switch (action) {
+                  case EmployeeActionTypes.DETAILS:
+                    this.setState({
+                      selectedEmployee: this.state.openMenu,
+                      openMenu: null,
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      selectedEmployee: this.state.openMenu,
+                      open: action,
+                    });
+                }
+              }}
+            />
+          </Modal>
+        )}
+        {this.state.openMenu !== null &&
+          this.state.open === EmployeeActionTypes.POSITIONS &&
+          this.getSelectedEmployee() !== null && (
+            <Modal
+              backDrop={true}
+              theme={Themes.default}
+              close={() =>
+                this.setState({
+                  openMenu: null,
+                  selectedEmployee: null,
+                  open: null,
+                })
+              }
+              backDropClose={true}
+              widthSizeClass={ModalSize.extraLarge}
+              displayClose={false}
+              padding={{
+                title: undefined,
+                body: undefined,
+                footer: undefined,
+              }}
+            >
+              <EmployeePositions
+                employee={this.state.openMenu}
+                activeEmployeePosition={this.employeeActivePosition(
+                  this.getSelectedEmployee()!.positions
+                )}
+                onClose={() =>
+                  this.setState({
+                    openMenu: null,
+                    open: null,
+                    selectedEmployee: null,
+                  })
+                }
               />
             </Modal>
           )}

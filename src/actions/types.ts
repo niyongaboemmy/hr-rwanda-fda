@@ -10,6 +10,7 @@ import {
   GetAllEmployeesInfoAction,
   GetEmployeeDetailsInfoAction,
   RemoveEmployeeBehaviorInfoAction,
+  RemoveEmployeeCustomAccessInfoAction,
 } from "./employee.action";
 import {
   GetAllPositionsInfoAction,
@@ -45,6 +46,7 @@ export enum ActionTypes {
   ADD_EMPLOYEE_BEHAVIOR = "ADD_EMPLOYEE_BEHAVIOR",
   GET_ALL_BEHAVIORS_DETAILS = "GET_ALL_BEHAVIORS_DETAILS",
   ADD_EMPLOYEE_CUSTOM_ACCESS = "ADD_EMPLOYEE_CUSTOM_ACCESS",
+  REMOVE_EMPLOYEE_CUSTOM_ACCESS = "REMOVE_EMPLOYEE_CUSTOM_ACCESS",
 }
 
 export type Action =
@@ -65,4 +67,5 @@ export type Action =
   | RemoveEmployeeBehaviorInfoAction
   | AddEmployeeBehaviorInfoAction
   | GetBehaviorsListDetailsInfoAction
-  | AddEmployeeCustomAccessInfoAction;
+  | AddEmployeeCustomAccessInfoAction
+  | RemoveEmployeeCustomAccessInfoAction;

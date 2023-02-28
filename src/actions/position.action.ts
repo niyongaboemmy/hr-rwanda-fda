@@ -75,6 +75,7 @@ export interface PositionDetailsInterface {
   unit_id: string;
   unit_name: string;
   user_id: string;
+  report_unit_id: string;
 }
 
 export interface PositionStore {

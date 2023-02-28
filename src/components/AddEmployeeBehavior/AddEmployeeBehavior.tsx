@@ -4,8 +4,8 @@ import { HiOutlineSelector } from "react-icons/hi";
 import { connect } from "react-redux";
 import {
   AddEmployeeBehaviorDataInterface,
-  Auth,
   BehaviorItemInterface,
+  EmployeeListInterface,
   FC_AddEmployeeBehavior,
   FC_GetSystemBehaviorsListDetails,
   FC_GetSystemInfo,
@@ -18,8 +18,8 @@ import Loading from "../Loading/Loading";
 import SelectCustom from "../SelectCustom/SelectCustom";
 
 interface AddEmployeeBehaviorProps {
+  employee: EmployeeListInterface;
   system: System;
-  auth: Auth;
   FC_AddEmployeeBehavior: (
     data: AddEmployeeBehaviorDataInterface,
     callback: (loading: boolean, error: string) => void
@@ -75,44 +75,36 @@ class _AddEmployeeBehavior extends Component<
     if (this.state.proficiency_level_id === "") {
       return this.setState({ error: "Please select proficiency level!" });
     }
-    if (
-      this.props.auth.user !== null &&
-      this.props.auth.isAuthenticated === true
-    ) {
-      this.setState({ saving_data: true });
-      this.props.FC_AddEmployeeBehavior(
-        {
-          assignment_comment: this.state.assignment_comment,
-          behavior_id: this.state.selectedBehavior.behavior_id,
-          proficiency_level_id: this.state.proficiency_level_id,
-          user_id: this.props.auth.user.user_id,
-        },
-        (loading: boolean, error: string) => {
-          this.setState({ saving_data: loading, error: error });
-          if (
-            loading === false &&
-            error === "" &&
-            this.state.selectedBehavior !== null &&
-            this.props.auth.user !== null
-          ) {
-            this.props.onCreated({
-              assignment_comment: this.state.assignment_comment,
-              behavior_id: this.state.selectedBehavior.behavior_id,
-              proficiency_level_id: this.state.proficiency_level_id,
-              user_id: this.props.auth.user.user_id,
-            });
-            this.setState({
-              success: "Behavior saved successfully!",
-              assignment_comment: "",
-              proficiency_level_id: "",
-              selectedBehavior: null,
-            });
-          }
+    this.setState({ saving_data: true });
+    this.props.FC_AddEmployeeBehavior(
+      {
+        assignment_comment: this.state.assignment_comment,
+        behavior_id: this.state.selectedBehavior.behavior_id,
+        proficiency_level_id: this.state.proficiency_level_id,
+        user_id: this.props.employee.user_id,
+      },
+      (loading: boolean, error: string) => {
+        this.setState({ saving_data: loading, error: error });
+        if (
+          loading === false &&
+          error === "" &&
+          this.state.selectedBehavior !== null
+        ) {
+          this.props.onCreated({
+            assignment_comment: this.state.assignment_comment,
+            behavior_id: this.state.selectedBehavior.behavior_id,
+            proficiency_level_id: this.state.proficiency_level_id,
+            user_id: this.props.employee.user_id,
+          });
+          this.setState({
+            success: "Behavior saved successfully!",
+            assignment_comment: "",
+            proficiency_level_id: "",
+            selectedBehavior: null,
+          });
         }
-      );
-    } else {
-      this.setState({ error: "Not authenticated, Please reload the page!" });
-    }
+      }
+    );
   };
   componentDidMount(): void {
     if (
@@ -132,13 +124,21 @@ class _AddEmployeeBehavior extends Component<
           <div className="flex flex-row items-center gap-2">
             <div>
               <BackButton
-                title="Cancel action"
+                title="Go Back"
                 className="bg-primary-100 text-primary-800 hover:bg-primary-800 hover:text-white"
                 onClick={this.props.onCancel}
               />
             </div>
             <div>
-              <div className="font-bold text-xl">Assign employee behavior</div>
+              <div className="flex flex-row items-center gap-2">
+                <div className="font-bold text-xl">
+                  Assign employee behavior
+                </div>
+                <div className="w-max px-2 rounded-full text-sm font-bold bg-primary-800 text-white">
+                  {this.props.employee.first_name}{" "}
+                  {this.props.employee.last_name}
+                </div>
+              </div>
               <div className="text-sm text-gray-500">
                 Fill the following form to update employee behavior to update
                 his/her position competency
@@ -312,12 +312,10 @@ class _AddEmployeeBehavior extends Component<
 
 const mapStateToProps = ({
   system,
-  auth,
 }: StoreState): {
   system: System;
-  auth: Auth;
 } => {
-  return { system, auth };
+  return { system };
 };
 
 export const AddEmployeeBehavior = connect(mapStateToProps, {
