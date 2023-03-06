@@ -88,11 +88,16 @@ class _EmployeesManagement extends Component<
     }
     var response = this.props.employee.employees;
     if (this.state.selectedUnit !== null) {
-      // response = response.filter(
-      //   (itm) =>
-      //     this.state.selectedUnit !== null &&
-      //     itm.unit_id.toString() === this.state.selectedUnit.unit_id.toString()
-      // );
+      response = response.filter(
+        (itm) =>
+          this.state.selectedUnit !== null &&
+          itm.positions.find(
+            (test) =>
+              this.state.selectedUnit !== null &&
+              test.unit_id.toString() ===
+                this.state.selectedUnit.unit_id.toString()
+          ) !== undefined
+      );
     }
     return search(response, this.state.searchData) as EmployeeListInterface[];
   };
@@ -146,6 +151,43 @@ class _EmployeesManagement extends Component<
       }
     }
     return null;
+  };
+
+  getEmployeesPositions = () => {
+    if (
+      this.props.employee.employees !== null &&
+      this.props.employee.employees.length > 0
+    ) {
+      const response: {
+        position_id: string;
+        employees_number: number;
+        unit_id: string;
+      }[] = [];
+      for (const item of this.props.employee.employees) {
+        const position = item.positions.map((position) => ({
+          position_id: position.position_id,
+          employees_number:
+            this.props.employee.employees === null
+              ? 0
+              : this.props.employee.employees.filter((itm) =>
+                  itm.positions.find(
+                    (pos) => pos.position_id === position.position_id
+                  )
+                ).length,
+          unit_id: position.unit_id,
+        }));
+        if (
+          position.length > 0 &&
+          response.find(
+            (itm) => itm.position_id === position[0].position_id
+          ) === undefined
+        ) {
+          response.push(position[0]);
+        }
+      }
+      return response;
+    }
+    return [];
   };
 
   render() {
@@ -417,12 +459,7 @@ class _EmployeesManagement extends Component<
               }}
             >
               <SelectUnit
-                // positionsCounter={this.props.employee.employees.map((item) => ({
-                //   position_id: item.position_id,
-                //   employees_number: item.employee_number,
-                //   unit_id: item.unit_id,
-                // }))}
-                positionsCounter={[]}
+                positionsCounter={this.getEmployeesPositions()}
                 onSelect={(unit: UnitInterface | null) =>
                   this.setState({ selectedUnit: unit, openSelectUnit: false })
                 }

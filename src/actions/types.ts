@@ -21,9 +21,21 @@ import {
   GetAccessListDetailsInfoAction,
   GetBehaviorsListDetailsInfoAction,
   GetSystemInfoAction,
+  GetTrainingOfferModesInfoAction,
   SetSystemErrorMessageAction,
   SetSystemSuccessMessageAction,
 } from "./system.action";
+import {
+  AddTrainingAttendedReportInfoAction,
+  AddTrainingPlanParticipantInfoAction,
+  CreateTrainingPlanInfoAction,
+  GetTrainingAttendedInfoAction,
+  GetTrainingPlansByParticipantInfoAction,
+  GetTrainingPlansByYearInfoAction,
+  GetTrainingProvidersInfoAction,
+  RemoveTrainingAttendedReportInfoAction,
+  UpdateTrainingPlanInfoAction,
+} from "./training.action";
 import { GetAllUnitsInfoAction } from "./units.action";
 
 export enum ActionTypes {
@@ -47,6 +59,16 @@ export enum ActionTypes {
   GET_ALL_BEHAVIORS_DETAILS = "GET_ALL_BEHAVIORS_DETAILS",
   ADD_EMPLOYEE_CUSTOM_ACCESS = "ADD_EMPLOYEE_CUSTOM_ACCESS",
   REMOVE_EMPLOYEE_CUSTOM_ACCESS = "REMOVE_EMPLOYEE_CUSTOM_ACCESS",
+  GET_TRAINING_PLANS_BY_YEAR = "GET_TRAINING_PLANS_BY_YEAR",
+  CREATE_TRAINING_PLAN = "CREATE_TRAINING_PLAN",
+  GET_TRAINING_OFFER_MODES = "GET_TRAINING_OFFER_MODES",
+  ADD_TRAINING_PLAN_PARTICIPANT = "ADD_TRAINING_PLAN_PARTICIPANT",
+  UPDATE_TRAINING_PLAN = "UPDATE_TRAINING_PLAN",
+  GET_TRAINING_PROVIDERS = "GET_TRAINING_PROVIDERS",
+  GET_TRAINING_PLANS_PARTICIPANT = "GET_TRAINING_PLANS_PARTICIPANT",
+  GET_TRAINING_ATTENDANCE = "GET_TRAINING_ATTENDANCE",
+  ADD_TRAINING_ATTENDED_REPORT = "ADD_TRAINING_ATTENDED_REPORT",
+  REMOVE_TRAINING_ATTENDED_REPORT = "REMOVE_TRAINING_ATTENDED_REPORT",
 }
 
 export type Action =
@@ -68,4 +90,14 @@ export type Action =
   | AddEmployeeBehaviorInfoAction
   | GetBehaviorsListDetailsInfoAction
   | AddEmployeeCustomAccessInfoAction
-  | RemoveEmployeeCustomAccessInfoAction;
+  | RemoveEmployeeCustomAccessInfoAction
+  | GetTrainingPlansByYearInfoAction
+  | CreateTrainingPlanInfoAction
+  | GetTrainingOfferModesInfoAction
+  | AddTrainingPlanParticipantInfoAction
+  | UpdateTrainingPlanInfoAction
+  | GetTrainingProvidersInfoAction
+  | GetTrainingPlansByParticipantInfoAction
+  | GetTrainingAttendedInfoAction
+  | AddTrainingAttendedReportInfoAction
+  | RemoveTrainingAttendedReportInfoAction;

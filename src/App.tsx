@@ -62,6 +62,22 @@ const EmployeesManagement = lazy(() =>
   )
 );
 
+const TrainingPlans = lazy(() =>
+  import("./containers/TrainingPlans/TrainingPlans").then(
+    ({ TrainingPlans }) => ({
+      default: TrainingPlans,
+    })
+  )
+);
+
+const EmployeeTraining = lazy(() =>
+  import("./containers/EmployeeTraining/EmployeeTraining").then(
+    ({ EmployeeTraining }) => ({
+      default: EmployeeTraining,
+    })
+  )
+);
+
 //* Interfaces
 // props for the component
 interface AppProps {
@@ -246,6 +262,32 @@ class _App extends React.Component<AppProps, AppState> {
                       <ProtectedRoute
                         path="/employees-management"
                         component={EmployeesManagement}
+                        isAuthenticated={this.props.auth.isAuthenticated}
+                        authenticationPath={authenticationPath}
+                        loading={this.state.loading}
+                        exact
+                      />
+                    )}
+                    {isAccessAuthorized(
+                      this.props.auth.selectedEmployment,
+                      UserAccessList.TRAINING_PLANS
+                    ).view === true && (
+                      <ProtectedRoute
+                        path="/training-plans"
+                        component={TrainingPlans}
+                        isAuthenticated={this.props.auth.isAuthenticated}
+                        authenticationPath={authenticationPath}
+                        loading={this.state.loading}
+                        exact
+                      />
+                    )}
+                    {isAccessAuthorized(
+                      this.props.auth.selectedEmployment,
+                      UserAccessList.EMPLOYEE_TRAINING
+                    ).view === true && (
+                      <ProtectedRoute
+                        path="/employee-trainings"
+                        component={EmployeeTraining}
                         isAuthenticated={this.props.auth.isAuthenticated}
                         authenticationPath={authenticationPath}
                         loading={this.state.loading}

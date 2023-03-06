@@ -33,6 +33,15 @@ export const systemReducer = (state: System = defaultState, action: Action) => {
           domain: action.payload.domain,
           job_family: action.payload.job_family,
           proficiency_level: action.payload.proficiency_level,
+          division: action.payload.division,
+          training_offer_modes:
+            state.basic_info === null ||
+            action.payload.training_offer_modes === undefined
+              ? state.basic_info !== null &&
+                state.basic_info.training_offer_modes.length > 0
+                ? state.basic_info.training_offer_modes
+                : []
+              : action.payload.training_offer_modes,
         },
       };
     case ActionTypes.SET_SYSTEM_ERROR_MESSAGE:
@@ -72,6 +81,38 @@ export const systemReducer = (state: System = defaultState, action: Action) => {
             state.basic_info === null ? [] : state.basic_info.job_family,
           proficiency_level:
             state.basic_info === null ? [] : state.basic_info.proficiency_level,
+          division: state.basic_info === null ? [] : state.basic_info.division,
+          training_offer_modes:
+            state.basic_info === null
+              ? []
+              : state.basic_info.training_offer_modes,
+        },
+      };
+    case ActionTypes.GET_TRAINING_OFFER_MODES:
+      return {
+        ...state,
+        basic_info: {
+          behavior:
+            state.basic_info === null || state.basic_info.behavior === undefined
+              ? []
+              : state.basic_info.behavior,
+          competency_classification:
+            state.basic_info === null
+              ? []
+              : state.basic_info.competency_classification,
+          competency_function:
+            state.basic_info === null
+              ? []
+              : state.basic_info.competency_function,
+          competency_type:
+            state.basic_info === null ? [] : state.basic_info.competency_type,
+          domain: state.basic_info === null ? [] : state.basic_info.domain,
+          job_family:
+            state.basic_info === null ? [] : state.basic_info.job_family,
+          proficiency_level:
+            state.basic_info === null ? [] : state.basic_info.proficiency_level,
+          division: state.basic_info === null ? [] : state.basic_info.division,
+          training_offer_modes: action.payload,
         },
       };
     default:

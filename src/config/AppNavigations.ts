@@ -1,9 +1,15 @@
 import { IconType } from "react-icons";
-import { MdOutlineDashboard } from "react-icons/md";
+import {
+  MdDesktopWindows,
+  MdOutlineDashboard,
+  MdTravelExplore,
+} from "react-icons/md";
 import { HiOutlineBriefcase, HiOutlineUser } from "react-icons/hi";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { UserAccessList } from "./userAccess";
-import { FaUsersCog } from "react-icons/fa";
+import { FaChalkboardTeacher, FaUsersCog } from "react-icons/fa";
+import { IoMdWalk } from "react-icons/io";
+import { BsCalendar2Check } from "react-icons/bs";
 
 export enum MENU_TYPE {
   NONE = "NONE",
@@ -75,6 +81,14 @@ export const AUTHENTICATED_MENUS: SideNavigationInterface[] = [
     access: "all",
   },
   {
+    icon: MdDesktopWindows,
+    title: "My Position",
+    label: "My Position",
+    url: "/my-position",
+    menu_type: MENU_TYPE.PROFILE,
+    access: "all",
+  },
+  {
     icon: RiLockPasswordLine,
     title: "Change Password",
     label: "Change Password",
@@ -92,11 +106,43 @@ export const AUTHENTICATED_MENUS: SideNavigationInterface[] = [
   },
   {
     icon: FaUsersCog,
-    title: "Employees",
-    label: "Employees",
+    title: "Employees Management",
+    label: "Employees Management",
     url: "/employees-management",
     menu_type: MENU_TYPE.ACTIVITIES,
     access: UserAccessList.EMPLOYEES_LIST,
+  },
+  {
+    icon: FaChalkboardTeacher,
+    title: "My Trainings",
+    label: "My Trainings",
+    url: "/employee-trainings",
+    menu_type: MENU_TYPE.ACTIVITIES,
+    access: UserAccessList.EMPLOYEE_TRAINING,
+  },
+  {
+    icon: BsCalendar2Check,
+    title: "Training Plans",
+    label: "Training Plans",
+    url: "/training-plans",
+    menu_type: MENU_TYPE.ACTIVITIES,
+    access: UserAccessList.EMPLOYEES_TRAINING_PLANS,
+  },
+  {
+    icon: IoMdWalk,
+    title: "My Leaves",
+    label: "My Leaves",
+    url: "/employee-leave",
+    menu_type: MENU_TYPE.ACTIVITIES,
+    access: UserAccessList.LEAVES,
+  },
+  {
+    icon: MdTravelExplore,
+    title: "My Travels",
+    label: "My Travels",
+    url: "/employee-travel",
+    menu_type: MENU_TYPE.ACTIVITIES,
+    access: UserAccessList.TRAVELS,
   },
 ];
 

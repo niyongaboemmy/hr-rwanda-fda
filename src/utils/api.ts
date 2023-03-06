@@ -4,3 +4,6 @@ export const DISTRICTS_LOCATION = "https://deafactionrda.org/locations.json";
 
 // Files location
 export const IMAGES_PATH = {};
+export enum DocFolder {
+  docs = "docs",
+}

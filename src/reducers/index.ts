@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import { Auth, System } from "../actions";
+import { Auth, System, TrainingStore } from "../actions";
 import { EmployeeStore } from "../actions/employee.action";
 import { PositionStore } from "../actions/position.action";
 import { UnitStore } from "../actions/units.action";
@@ -7,6 +7,7 @@ import { authReducer } from "./auth.reducer";
 import { employeeReducer } from "./employee.reducer";
 import { positionReducer } from "./position.reducer";
 import { systemReducer } from "./system.reducer";
+import { trainingsReducer } from "./training.reducer";
 import { unitsReducer } from "./units.reducer";
 
 // define the entire state into the entire side
@@ -16,6 +17,7 @@ export interface StoreState {
   position: PositionStore;
   units: UnitStore;
   employee: EmployeeStore;
+  training: TrainingStore;
 }
 
 export const reducers = combineReducers<StoreState>({
@@ -24,4 +26,5 @@ export const reducers = combineReducers<StoreState>({
   position: positionReducer,
   units: unitsReducer,
   employee: employeeReducer,
+  training: trainingsReducer,
 });

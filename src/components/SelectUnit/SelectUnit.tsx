@@ -146,11 +146,17 @@ export class _SelectUnit extends Component<SelectUnitProps, SelectUnitState> {
                 onClick={() => this.props.onSelect(item)}
                 unit={item}
                 total_positions={
-                  this.props.positionsCounter.filter(
-                    (itm) => itm.unit_id === item.unit_id
-                  ).length
+                  this.props.positionsCounter.length > 0
+                    ? this.props.positionsCounter.filter(
+                        (itm) => itm.unit_id === item.unit_id
+                      ).length
+                    : undefined
                 }
-                total_employees={this.GetTotalEmployeesByUnit(item.unit_id)}
+                total_employees={
+                  this.props.positionsCounter.length > 0
+                    ? this.GetTotalEmployeesByUnit(item.unit_id)
+                    : undefined
+                }
               />
             ))
           )}

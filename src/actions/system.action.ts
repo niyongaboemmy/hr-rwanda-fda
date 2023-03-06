@@ -21,6 +21,16 @@ export interface BehaviorItemInterface {
   behavior_name: string;
 }
 
+export interface DivisionItem {
+  division_id: string;
+  division_name: string;
+}
+
+export interface TrainingOfferModeItem {
+  training_offer_mode_id: string;
+  offer_mode: string;
+}
+
 export interface BasicInfo {
   behavior: BehaviorItemInterface[];
   competency_classification: {
@@ -47,6 +57,8 @@ export interface BasicInfo {
     proficiency_level_id: string;
     proficiency_level: string;
   }[];
+  division: DivisionItem[];
+  training_offer_modes: TrainingOfferModeItem[];
 }
 
 export interface AccessListDetails {
@@ -85,6 +97,11 @@ export interface SetSystemErrorMessageAction {
 export interface SetSystemSuccessMessageAction {
   type: ActionTypes.SET_SYSTEM_SUCCESS_MESSAGE;
   payload: string;
+}
+
+export interface GetTrainingOfferModesInfoAction {
+  type: ActionTypes.GET_TRAINING_OFFER_MODES;
+  payload: TrainingOfferModeItem[];
 }
 
 /**
@@ -191,5 +208,34 @@ export const FC_SetSuccess = (msg: string) => {
       type: ActionTypes.SET_SYSTEM_SUCCESS_MESSAGE,
       payload: msg,
     });
+  };
+};
+
+export const FC_GetTrainingOfferModes = (
+  callback: (loading: boolean) => void
+) => {
+  return async (dispatch: Dispatch) => {
+    callback(true);
+    setAxiosToken();
+    try {
+      const res = await axios.get<TrainingOfferModeItem[]>(
+        `${API_URL}/training/offer/mode`
+      );
+
+      console.log({ training_offer_modes: res.data });
+
+      dispatch<GetTrainingOfferModesInfoAction>({
+        type: ActionTypes.GET_TRAINING_OFFER_MODES,
+        payload: res.data,
+      });
+      callback(false);
+    } catch (error: any) {
+      dispatch<SetSystemErrorMessageAction>({
+        type: ActionTypes.SET_SYSTEM_ERROR_MESSAGE,
+        payload: errorToText(error),
+      });
+      callback(false);
+      console.log("err: ", { ...error });
+    }
   };
 };
