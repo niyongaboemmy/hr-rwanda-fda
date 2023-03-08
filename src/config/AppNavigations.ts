@@ -82,9 +82,9 @@ export const AUTHENTICATED_MENUS: SideNavigationInterface[] = [
   },
   {
     icon: MdDesktopWindows,
-    title: "My Position",
-    label: "My Position",
-    url: "/my-position",
+    title: "My Competency",
+    label: "My Competency",
+    url: "/my-competency",
     menu_type: MENU_TYPE.PROFILE,
     access: "all",
   },

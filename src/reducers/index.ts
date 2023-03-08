@@ -1,10 +1,11 @@
 import { combineReducers } from "redux";
-import { Auth, System, TrainingStore } from "../actions";
+import { Auth, LeaveStore, System, TrainingStore } from "../actions";
 import { EmployeeStore } from "../actions/employee.action";
 import { PositionStore } from "../actions/position.action";
 import { UnitStore } from "../actions/units.action";
 import { authReducer } from "./auth.reducer";
 import { employeeReducer } from "./employee.reducer";
+import { leaveReducer } from "./leave.reducer";
 import { positionReducer } from "./position.reducer";
 import { systemReducer } from "./system.reducer";
 import { trainingsReducer } from "./training.reducer";
@@ -18,6 +19,7 @@ export interface StoreState {
   units: UnitStore;
   employee: EmployeeStore;
   training: TrainingStore;
+  leave: LeaveStore;
 }
 
 export const reducers = combineReducers<StoreState>({
@@ -27,4 +29,5 @@ export const reducers = combineReducers<StoreState>({
   units: unitsReducer,
   employee: employeeReducer,
   training: trainingsReducer,
+  leave: leaveReducer,
 });

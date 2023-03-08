@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsArrowRightCircle } from "react-icons/bs";
+import { IoIosAddCircleOutline } from "react-icons/io";
 import { MdAssignment } from "react-icons/md";
 import { connect } from "react-redux";
 import {
@@ -48,6 +49,7 @@ interface TrainingEmployeeReportProps {
   FC_GetTrainingProviders: (
     callback: (loading: boolean, error: string) => void
   ) => void;
+  allowAddReport: boolean;
 }
 interface TrainingEmployeeReportState {
   trainings: TrainingAttendedInterface[] | null;
@@ -226,17 +228,18 @@ class _TrainingEmployeeReport extends Component<
             </div>
           </div>
           <div>
-            {this.state.trainings !== null &&
+            {this.props.allowAddReport === true &&
+              this.state.trainings !== null &&
               this.state.trainings.length > 0 &&
               this.state.removedTraining === "" && (
                 <div
                   onClick={this.props.onAddReport}
-                  className="bg-primary-700 text-white hover:bg-primary-800 hover:text-white px-3 py-2 pl-2 rounded-md cursor-pointer w-max font-semibold flex flex-row items-center justify-center gap-2"
+                  className="bg-green-600 text-white hover:bg-green-700 hover:text-white px-3 py-2 pl-2 rounded-md cursor-pointer w-max font-semibold flex flex-row items-center justify-center gap-2"
                 >
                   <div>
-                    <MdAssignment className="text-2xl" />
+                    <IoIosAddCircleOutline className="text-2xl" />
                   </div>
-                  <span>Report attended training</span>
+                  <span className="font-light">Add attended training</span>
                 </div>
               )}
           </div>

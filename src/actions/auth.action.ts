@@ -64,6 +64,7 @@ export interface EmploymentItem {
   end_date: string | null;
   is_active: BooleanEnum;
   position_name: string;
+  unit_id: string;
   access: UserAccessInterface[];
 }
 

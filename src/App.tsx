@@ -78,6 +78,14 @@ const EmployeeTraining = lazy(() =>
   )
 );
 
+const EmployeeLeaves = lazy(() =>
+  import("./containers/EmployeeLeave/EmployeeLeave").then(
+    ({ EmployeeLeaves }) => ({
+      default: EmployeeLeaves,
+    })
+  )
+);
+
 //* Interfaces
 // props for the component
 interface AppProps {
@@ -288,6 +296,19 @@ class _App extends React.Component<AppProps, AppState> {
                       <ProtectedRoute
                         path="/employee-trainings"
                         component={EmployeeTraining}
+                        isAuthenticated={this.props.auth.isAuthenticated}
+                        authenticationPath={authenticationPath}
+                        loading={this.state.loading}
+                        exact
+                      />
+                    )}
+                    {isAccessAuthorized(
+                      this.props.auth.selectedEmployment,
+                      UserAccessList.LEAVES
+                    ).view === true && (
+                      <ProtectedRoute
+                        path="/employee-leave"
+                        component={EmployeeLeaves}
                         isAuthenticated={this.props.auth.isAuthenticated}
                         authenticationPath={authenticationPath}
                         loading={this.state.loading}

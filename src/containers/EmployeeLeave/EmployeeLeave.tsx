@@ -1,94 +1,129 @@
 import React, { Component, Fragment } from "react";
-import { BsFillArrowRightCircleFill, BsFilterCircle } from "react-icons/bs";
-import { FaChalkboardTeacher } from "react-icons/fa";
-import { IoMdRefreshCircle } from "react-icons/io";
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { BsFilterCircle } from "react-icons/bs";
+import { IoIosAddCircleOutline, IoMdRefreshCircle } from "react-icons/io";
+import { MdDirectionsWalk, MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { connect } from "react-redux";
 import {
   Auth,
-  FC_GetTrainingPlansByParticipant,
-  TrainingPlansByParticipant,
-  TrainingStore,
+  EmployeeLeaveInterface,
+  FC_GetEmployeeLeaves,
+  FC_RemoveEmployeeLeave,
+  LeaveStore,
   UnitInterface,
 } from "../../actions";
 import Alert, { AlertType } from "../../components/Alert/Alert";
-import { TrainingPlanTempData } from "../../components/CreateTrainingPlan/TrainingPlanForm";
-import { NoResultFound } from "../../components/Fragments/NoResultFound";
 import SearchInput from "../../components/Fragments/SearchInput";
 import ExportToExcel from "../../components/GenerateReport/ExportToExcel";
 import MainContainer from "../../components/MainContainer/MainContainer";
 import Modal, { ModalSize, Themes } from "../../components/Modal/Modal";
 import { PositionItemLoading } from "../../components/PositionItem/PositionItemLoading";
+import { RequestLeave } from "../../components/RequestLeave/RequestLeave";
 import { SelectUnit } from "../../components/SelectUnit/SelectUnit";
-import { AddTrainingAttended } from "../../components/TrainingEmployeeReport/AddTrainingAttended";
-import { TrainingEmployeeReport } from "../../components/TrainingEmployeeReport/TrainingEmployeeReport";
 import { StoreState } from "../../reducers";
 import { commaFy, search } from "../../utils/functions";
+import { EmployeeLeavesList } from "./EmployeeLeavesList";
 
-interface TrainingPlansProps {
+interface EmployeeLeavesProps {
   auth: Auth;
-  training: TrainingStore;
-  FC_GetTrainingPlansByParticipant: (
+  leave: LeaveStore;
+  FC_GetEmployeeLeaves: (
     user_id: string,
     callback: (loading: boolean, error: string) => void
   ) => void;
+  FC_RemoveEmployeeLeave: (
+    employee_leave_id: string,
+    callback: (
+      loading: boolean,
+      res: { type: "success" | "error"; msg: string } | null
+    ) => void
+  ) => void;
 }
-interface TrainingPlansState {
+interface EmployeeLeavesState {
   loading: boolean;
-  tabs: "SUMMARY" | "TRAINING_PLANS";
+  tabs: "SUMMARY" | "EMPLOYEE_LEAVES";
   selectedUnit: UnitInterface | null;
   searchData: string;
   mainError: string;
   openSelectUnit: boolean;
   selectedYear: number;
-  temp_data: TrainingPlanTempData | undefined;
-  selectedTrainingPlan: TrainingPlansByParticipant | null;
-  addReport: boolean;
+  removingLeave: EmployeeLeaveInterface | null;
+  requestLeave: boolean;
+  error: string;
 }
 
-class _EmployeeTraining extends Component<
-  TrainingPlansProps,
-  TrainingPlansState
+class _EmployeeLeaves extends Component<
+  EmployeeLeavesProps,
+  EmployeeLeavesState
 > {
-  constructor(props: TrainingPlansProps) {
+  constructor(props: EmployeeLeavesProps) {
     super(props);
 
     this.state = {
       loading: false,
-      tabs: "TRAINING_PLANS",
+      tabs: "EMPLOYEE_LEAVES",
       selectedUnit: null,
       searchData: "",
       mainError: "",
       openSelectUnit: false,
       selectedYear: new Date().getFullYear(),
-      temp_data: undefined,
-      selectedTrainingPlan: null,
-      addReport: false,
+      removingLeave: null,
+      requestLeave: false,
+      error: "",
     };
   }
   FilteredData = () => {
-    if (this.props.training.employee_trainings === null) {
+    if (this.props.leave.employee_leaves === null) {
       return [];
     }
-    var response = this.props.training.employee_trainings;
-    return search(
-      response,
-      this.state.searchData
-    ) as TrainingPlansByParticipant[];
+    var response = this.props.leave.employee_leaves;
+    if (this.state.selectedUnit !== null) {
+      response = response.filter(
+        (itm) =>
+          this.state.selectedUnit !== null &&
+          itm.unit_id.toString() === this.state.selectedUnit.unit_id.toString()
+      );
+    }
+    return search(response, this.state.searchData) as EmployeeLeaveInterface[];
   };
-  GetTrainingPlans = () => {
+  GetEmployeeLeave = () => {
     this.setState({ loading: true });
     this.props.auth.user !== null &&
-      this.props.FC_GetTrainingPlansByParticipant(
+      this.props.FC_GetEmployeeLeaves(
         this.props.auth.user.user_id,
         (loading: boolean, error: string) => {
           this.setState({ loading: loading, mainError: error });
         }
       );
   };
+
+  RemoveLeave = (selectedLeave: EmployeeLeaveInterface) => {
+    if (
+      window.confirm(
+        "Are you sure do you want to remove " + selectedLeave.leave_name + "?"
+      ) === true
+    ) {
+      this.props.FC_RemoveEmployeeLeave(
+        selectedLeave.employee_leave_id,
+        (
+          loading: boolean,
+          res: { type: "success" | "error"; msg: string } | null
+        ) => {
+          if (res?.type === "success" && loading === false) {
+            this.setState({ removingLeave: null });
+          }
+          if (res?.type === "error") {
+            this.setState({ removingLeave: null, error: res.msg });
+          }
+        }
+      );
+    } else {
+      this.setState({ removingLeave: null });
+    }
+  };
+
   componentDidMount(): void {
-    if (this.props.training.employee_trainings === null) {
-      this.GetTrainingPlans();
+    if (this.props.leave.employee_leaves === null) {
+      this.GetEmployeeLeave();
     }
   }
   render() {
@@ -98,14 +133,12 @@ class _EmployeeTraining extends Component<
           <div className="flex flex-row items-center justify-between gap-2 w-full pl-2">
             <div className="flex flex-row items-center gap-3">
               <div>
-                <FaChalkboardTeacher className="text-5xl text-gray-400" />
+                <MdDirectionsWalk className="text-5xl text-gray-400" />
               </div>
               <div>
-                <div className="text-xl font-bold truncate">
-                  {"My Trainings"}
-                </div>
+                <div className="text-xl font-bold truncate">{"My leaves"}</div>
                 <div className="text-sm text-gray-600 truncate">
-                  {"List of trainings planned"}
+                  {"List of leaves that I requested"}
                 </div>
               </div>
             </div>
@@ -147,18 +180,25 @@ class _EmployeeTraining extends Component<
                 )}
                 <div className="flex flex-col">
                   <div className="text-sm text-gray-600 truncate">
-                    Total Plans
+                    Total leaves
                   </div>
                   <div className="font-bold text-xl -mt-1">
                     {commaFy(this.FilteredData().length)}
                   </div>
+                </div>
+                <div
+                  onClick={() => this.setState({ requestLeave: true })}
+                  className="px-3 py-2 pl-2 rounded-md bg-primary-800 text-white hover:bg-primary-900 cursor-pointer w-max font-semibold flex flex-row items-center gap-2 justify-center"
+                >
+                  <IoIosAddCircleOutline className="text-2xl" />
+                  <span>Request leave</span>
                 </div>
               </div>
             }
           </div>
           {/* Body */}
           {this.state.loading === true ||
-          this.props.training.employee_trainings === null ? (
+          this.props.leave.employee_leaves === null ? (
             <div className="mt-8 bg-white rounded-md p-3">
               <div>
                 {[1, 2, 3, 4, 5].map((item, i) => (
@@ -184,15 +224,15 @@ class _EmployeeTraining extends Component<
                       </div>
                       <div
                         onClick={() =>
-                          this.setState({ tabs: "TRAINING_PLANS" })
+                          this.setState({ tabs: "EMPLOYEE_LEAVES" })
                         }
                         className={`px-6 py-2 border-b-2 ${
-                          this.state.tabs === "TRAINING_PLANS"
+                          this.state.tabs === "EMPLOYEE_LEAVES"
                             ? "border-primary-700 text-primary-800 animate__animated animate__fadeIn"
                             : "border-white hover:border-primary-700 hover:text-primary-800"
                         } cursor-pointer`}
                       >
-                        Training Plans
+                        Leaves
                       </div>
                     </div>
                   </div>
@@ -204,8 +244,8 @@ class _EmployeeTraining extends Component<
                       }
                     />
                     <ExportToExcel
-                      fileData={this.props.training.employee_trainings}
-                      fileName={"Training Plans report"}
+                      fileData={this.props.leave.employee_leaves}
+                      fileName={"Employee leaves report"}
                     />
                   </div>
                 </div>
@@ -219,52 +259,23 @@ class _EmployeeTraining extends Component<
                   />
                 </div>
               )}
-              {this.state.tabs === "TRAINING_PLANS" && (
-                <div className="mt-6 animate__animated animate__fadeIn">
-                  {this.FilteredData().length === 0 ? (
-                    <NoResultFound />
-                  ) : (
-                    <div className="w-full">
-                      {this.FilteredData().map((item, i) => (
-                        <div
-                          key={i + 1}
-                          className="cursor-pointer bg-primary-50 hover:bg-primary-100 hover:text-primary-800 flex flex-row items-center justify-between gap-2 rounded-md p-2 px-2 group border border-primary-100"
-                          onClick={() =>
-                            this.setState({ selectedTrainingPlan: item })
-                          }
-                        >
-                          <div className="flex flex-row items-center gap-3">
-                            <div>
-                              <div className="bg-white text-primary-700 flex items-center justify-center h-14 w-14 rounded-md">
-                                <FaChalkboardTeacher className="text-3xl" />
-                              </div>
-                            </div>
-                            <div className="flex flex-col">
-                              <div className="font-normal text-primary-900 text-base group-hover:text-primary-800">
-                                {item.title}
-                              </div>
-                              <div className="flex flex-row items-center gap-2 text-sm italic">
-                                <span className="text-yellow-600 group-hover:text-black">
-                                  Click to view attended trainings
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <BsFillArrowRightCircleFill className="text-3xl text-primary-700 group-hover:text-primary-800" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              {this.state.tabs === "EMPLOYEE_LEAVES" && (
+                <EmployeeLeavesList
+                  allowed_to_validate={false}
+                  leaves={this.FilteredData()}
+                  RemoveLeave={this.RemoveLeave}
+                  removingLeave={this.state.removingLeave}
+                  setRemovingItem={(item: EmployeeLeaveInterface) =>
+                    this.setState({ removingLeave: item })
+                  }
+                />
               )}
             </MainContainer>
           )}
         </div>
 
         {this.state.openSelectUnit && (
-          //  this.props.training.training_plans !== null &&
+          //  this.props.training.EMPLOYEE_LEAVES !== null &&
           <Modal
             backDrop={true}
             theme={Themes.default}
@@ -287,57 +298,29 @@ class _EmployeeTraining extends Component<
             />
           </Modal>
         )}
-        {this.state.selectedTrainingPlan !== null &&
-          this.state.addReport === false && (
-            <Modal
-              backDrop={true}
-              theme={Themes.default}
-              close={() => this.setState({ selectedTrainingPlan: null })}
-              backDropClose={true}
-              widthSizeClass={ModalSize.extraLarge}
-              displayClose={false}
-              padding={{
-                title: undefined,
-                body: undefined,
-                footer: undefined,
+        {this.state.requestLeave === true && (
+          <Modal
+            backDrop={true}
+            theme={Themes.default}
+            close={() => this.setState({ requestLeave: false })}
+            backDropClose={true}
+            widthSizeClass={ModalSize.extraLarge}
+            displayClose={false}
+            padding={{
+              title: undefined,
+              body: undefined,
+              footer: undefined,
+            }}
+          >
+            <RequestLeave
+              onGoBack={() => this.setState({ requestLeave: false })}
+              onCreated={() => {
+                this.setState({ requestLeave: false });
+                this.GetEmployeeLeave();
               }}
-            >
-              <TrainingEmployeeReport
-                trainingPlan={this.state.selectedTrainingPlan}
-                onGoBack={() => this.setState({ selectedTrainingPlan: null })}
-                onAddReport={() => {
-                  if (this.state.selectedTrainingPlan !== null) {
-                    this.setState({ addReport: true });
-                  }
-                }}
-                allowAddReport={true}
-              />
-            </Modal>
-          )}
-        {this.state.selectedTrainingPlan !== null &&
-          this.state.addReport === true && (
-            <Modal
-              backDrop={true}
-              theme={Themes.default}
-              close={() => this.setState({ addReport: false })}
-              backDropClose={true}
-              widthSizeClass={ModalSize.extraLarge}
-              displayClose={false}
-              padding={{
-                title: undefined,
-                body: undefined,
-                footer: undefined,
-              }}
-            >
-              <AddTrainingAttended
-                trainingPlan={this.state.selectedTrainingPlan}
-                onGoBack={() => this.setState({ addReport: false })}
-                onCreated={() => {
-                  this.setState({ addReport: false });
-                }}
-              />
-            </Modal>
-          )}
+            />
+          </Modal>
+        )}
       </Fragment>
     );
   }
@@ -345,14 +328,15 @@ class _EmployeeTraining extends Component<
 
 const mapStateToProps = ({
   auth,
-  training,
+  leave,
 }: StoreState): {
   auth: Auth;
-  training: TrainingStore;
+  leave: LeaveStore;
 } => {
-  return { auth, training };
+  return { auth, leave };
 };
 
-export const EmployeeTraining = connect(mapStateToProps, {
-  FC_GetTrainingPlansByParticipant,
-})(_EmployeeTraining);
+export const EmployeeLeaves = connect(mapStateToProps, {
+  FC_GetEmployeeLeaves,
+  FC_RemoveEmployeeLeave,
+})(_EmployeeLeaves);

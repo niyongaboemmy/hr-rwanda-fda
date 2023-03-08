@@ -32,6 +32,8 @@ import { EmployeeDetails } from "../../components/EmployeeDetails/EmployeeDetail
 import { isAccessAuthorized, UserAccessList } from "../../config/userAccess";
 import ActionMenu from "./ActionMenu";
 import { EmployeePositions } from "./EmployeePositions";
+import { EmployeeTrainingComponent } from "./EmployeeTrainingComponent";
+import { EmployeeLeaveComponent } from "./EmployeeLeaveComponent";
 
 export enum EmployeeActionTypes {
   DETAILS = "DETAILS",
@@ -527,6 +529,80 @@ class _EmployeesManagement extends Component<
               }}
             >
               <EmployeePositions
+                employee={this.state.openMenu}
+                activeEmployeePosition={this.employeeActivePosition(
+                  this.getSelectedEmployee()!.positions
+                )}
+                onClose={() =>
+                  this.setState({
+                    openMenu: null,
+                    open: null,
+                    selectedEmployee: null,
+                  })
+                }
+              />
+            </Modal>
+          )}
+        {this.state.openMenu !== null &&
+          this.state.open === EmployeeActionTypes.TRAINING &&
+          this.getSelectedEmployee() !== null && (
+            <Modal
+              backDrop={true}
+              theme={Themes.default}
+              close={() =>
+                this.setState({
+                  openMenu: null,
+                  selectedEmployee: null,
+                  open: null,
+                })
+              }
+              backDropClose={true}
+              widthSizeClass={ModalSize.extraLarge}
+              displayClose={false}
+              padding={{
+                title: undefined,
+                body: undefined,
+                footer: undefined,
+              }}
+            >
+              <EmployeeTrainingComponent
+                employee={this.state.openMenu}
+                activeEmployeePosition={this.employeeActivePosition(
+                  this.getSelectedEmployee()!.positions
+                )}
+                onClose={() =>
+                  this.setState({
+                    openMenu: null,
+                    open: null,
+                    selectedEmployee: null,
+                  })
+                }
+              />
+            </Modal>
+          )}
+        {this.state.openMenu !== null &&
+          this.state.open === EmployeeActionTypes.LEAVE &&
+          this.getSelectedEmployee() !== null && (
+            <Modal
+              backDrop={true}
+              theme={Themes.default}
+              close={() =>
+                this.setState({
+                  openMenu: null,
+                  selectedEmployee: null,
+                  open: null,
+                })
+              }
+              backDropClose={true}
+              widthSizeClass={ModalSize.extraLarge}
+              displayClose={false}
+              padding={{
+                title: undefined,
+                body: undefined,
+                footer: undefined,
+              }}
+            >
+              <EmployeeLeaveComponent
                 employee={this.state.openMenu}
                 activeEmployeePosition={this.employeeActivePosition(
                   this.getSelectedEmployee()!.positions

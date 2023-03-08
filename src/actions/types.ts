@@ -13,6 +13,11 @@ import {
   RemoveEmployeeCustomAccessInfoAction,
 } from "./employee.action";
 import {
+  GetEmployeeLeavesInfoAction,
+  GetLeaveCategoriesInfoAction,
+  RemoveEmployeeLeaveInfoAction,
+} from "./leave.action";
+import {
   GetAllPositionsInfoAction,
   SetPositionCompetenciesAction,
   UpdatePositionAccessInfoAction,
@@ -69,6 +74,9 @@ export enum ActionTypes {
   GET_TRAINING_ATTENDANCE = "GET_TRAINING_ATTENDANCE",
   ADD_TRAINING_ATTENDED_REPORT = "ADD_TRAINING_ATTENDED_REPORT",
   REMOVE_TRAINING_ATTENDED_REPORT = "REMOVE_TRAINING_ATTENDED_REPORT",
+  GET_LEAVE_CATEGORIES = "GET_LEAVE_CATEGORIES",
+  GET_EMPLOYEE_LEAVES = "GET_EMPLOYEE_LEAVES",
+  REMOVE_EMPLOYEE_LEAVE = "REMOVE_EMPLOYEE_LEAVE",
 }
 
 export type Action =
@@ -100,4 +108,7 @@ export type Action =
   | GetTrainingPlansByParticipantInfoAction
   | GetTrainingAttendedInfoAction
   | AddTrainingAttendedReportInfoAction
-  | RemoveTrainingAttendedReportInfoAction;
+  | RemoveTrainingAttendedReportInfoAction
+  | GetLeaveCategoriesInfoAction
+  | GetEmployeeLeavesInfoAction
+  | RemoveEmployeeLeaveInfoAction;

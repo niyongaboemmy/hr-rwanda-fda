@@ -45,6 +45,11 @@ export const trainingsReducer = (
         ...state,
         // training_plans:
       };
+    case ActionTypes.LOGOUT:
+      return {
+        ...state,
+        employee_trainings: null,
+      };
     default:
       return state;
   }

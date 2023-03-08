@@ -495,6 +495,45 @@ export const FC_GetTrainingPlansByParticipant = (
   };
 };
 
+export const FC_GetTrainingPlansByCustomParticipant = (
+  user_id: string,
+  callback: (
+    loading: boolean,
+    res: {
+      type: "success" | "error";
+      msg: string;
+      data: TrainingPlansByParticipant[];
+    } | null
+  ) => void
+) => {
+  return async (dispatch: Dispatch) => {
+    callback(true, null);
+    setAxiosToken();
+    try {
+      const res = await axios.get<TrainingPlansByParticipant[]>(
+        `${API_URL}/training/participate/${user_id}`
+      );
+      console.log({ TrainingProviders: res.data });
+      callback(false, {
+        type: "success",
+        msg: "",
+        data: res.data,
+      });
+    } catch (error: any) {
+      dispatch<SetSystemErrorMessageAction>({
+        type: ActionTypes.SET_SYSTEM_ERROR_MESSAGE,
+        payload: errorToText(error),
+      });
+      callback(false, {
+        type: "error",
+        msg: errorToText(error),
+        data: [],
+      });
+      console.log("err: ", { ...error });
+    }
+  };
+};
+
 export const FC_GetTrainingsReportedByEmployee = (
   user_id: string,
   training_plan_id: string,

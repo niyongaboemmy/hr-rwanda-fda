@@ -14,9 +14,11 @@ const Textarea = (props: {
     <div>
       <div className="text-sm">{props.title}</div>
       <textarea
-        className={`px-3 py-2 text-sm w-full border bg-gray-100 ${
+        className={`px-3 py-2 text-sm w-full border  ${
           props.error !== "" ? "border-red-600" : ""
-        } rounded-md ${props.className !== undefined ? props.className : ""}`}
+        } rounded-md ${
+          props.className !== undefined ? props.className : "bg-gray-100"
+        }`}
         disabled={props.disabled}
         value={props.value}
         onChange={props.onChange}
